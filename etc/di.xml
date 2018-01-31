@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<!--
+// vim: set ts=2 sw=2 sts=2 et:
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * @author     Qualiteam Software <info@x-cart.com>
+ * @category   Cdev
+ * @package    Cdev_XPaymentsConnector
+ * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Internal XPC logger -->
+    <type name="Cdev\XPaymentsConnector\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Cdev\XPaymentsConnector\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">xpcLogger</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Cdev\XPaymentsConnector\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="XpcFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\Cdev\XPaymentsConnector\Model\Ui\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Cdev\XPaymentsConnector\Block\Payment\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">XpcValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">XpcCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Configuration reader -->
+    <virtualType name="XpcConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\Cdev\XPaymentsConnector\Model\Ui\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Logger, initialized with XpcConfig -->
+    <virtualType name="XpcLogger" type="Magento\Payment\Model\Method\Logger">
+        <arguments>
+            <argument name="config" xsi:type="object">XpcConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Cdev\XPaymentsConnector\Gateway\Http\Client\ClientMock">
+        <arguments>
+            <argument name="logger" xsi:type="object">XpcLogger</argument>
+        </arguments>
+    </type>
+
+    <!-- Commands infrastructure -->
+    <virtualType name="XpcCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">XpcAuthorizeCommand</item>
+                <item name="sale" xsi:type="string">XpcAuthorizeCommand</item>
+                <item name="capture" xsi:type="string">XpcCaptureStrategyCommand</item>
+                <item name="settlement" xsi:type="string">XpcCaptureCommand</item>
+                <item name="void" xsi:type="string">XpcVoidCommand</item>
+                <item name="refund" xsi:type="string">XpcRefundCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="XpcCaptureStrategyCommand" type="Cdev\XPaymentsConnector\Gateway\Command\CaptureStrategyCommand">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">XpcCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorize command -->
+    <virtualType name="XpcAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">XpcAuthorizationRequest</argument>
+            <argument name="handler" xsi:type="object">XpcResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Http\Client\ClientMock</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorization Request -->
+    <virtualType name="XpcAuthorizationRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">Cdev\XPaymentsConnector\Gateway\Request\AuthorizationRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Cdev\XPaymentsConnector\Gateway\Request\AuthorizationRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">XpcConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Capture command -->
+    <virtualType name="XpcCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Request\CaptureRequest</argument>
+            <argument name="handler" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Response\InfoHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Http\Client\ClientMock</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Capture Request -->
+    <type name="Cdev\XPaymentsConnector\Gateway\Request\CaptureRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">XpcConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Void command -->
+    <virtualType name="XpcVoidCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Request\VoidRequest</argument>
+            <argument name="handler" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Response\InfoHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Http\Client\ClientMock</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Void Request -->
+    <type name="Cdev\XPaymentsConnector\Gateway\Request\VoidRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">XpcConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Refund command -->
+    <virtualType name="XpcRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Request\RefundRequest</argument>
+            <argument name="handler" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Response\InfoHandler</argument>
+            <argument name="transferFactory" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Cdev\XPaymentsConnector\Gateway\Http\Client\ClientMock</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund Request -->
+    <type name="Cdev\XPaymentsConnector\Gateway\Request\RefundRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">XpcConfig</argument>
+        </arguments>
+    </type>
+
+    <!-- Response handlers -->
+    <virtualType name="XpcResponseHandlerComposite" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="txnid" xsi:type="string">Cdev\XPaymentsConnector\Gateway\Response\InfoHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Value handlers infrastructure -->
+    <virtualType name="XpcValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">XpcConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="XpcConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">XpcConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Cdev\XPaymentsConnector\Block\Info">
+        <arguments>
+            <argument name="config" xsi:type="object">XpcConfig</argument>
+        </arguments>
+    </type>
+
+</config>

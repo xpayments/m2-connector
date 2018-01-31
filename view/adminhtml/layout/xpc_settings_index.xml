@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!--
+// vim: set ts=4 sw=4 sts=4 et:
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * @author     Qualiteam Software <info@x-cart.com>
+ * @category   Cdev
+ * @package    Cdev_XPaymentsConnector
+ * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>X-Payments Connector</title>
+        <css src="Cdev_XPaymentsConnector::css/settings.css" />
+        <script src="Cdev_XPaymentsConnector::js/settings.js" />
+    </head>
+    <body>
+        <referenceContainer name="left">
+            <block class="Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tabs" name="xpc_settings_tabs">
+                <block class="Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\Welcome" name="xpc_settings_tab_welcome" />
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">welcome</argument>
+                    <argument name="block" xsi:type="string">xpc_settings_tab_welcome</argument>
+                </action>
+                <block class="Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\Connection" name="xpc_settings_tab_connection" />
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">connection</argument>
+                    <argument name="block" xsi:type="string">xpc_settings_tab_connection</argument>
+                </action>
+                <block class="Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\PaymentMethods" name="xpc_settings_tab_payment_methods" />
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">payment_methods</argument>
+                    <argument name="block" xsi:type="string">xpc_settings_tab_payment_methods</argument>
+                </action>
+                <block class="Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\ZeroAuth" name="xpc_settings_tab_zero_auth" />
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">zero_auth</argument>
+                    <argument name="block" xsi:type="string">xpc_settings_tab_zero_auth</argument>
+                </action>
+            </block>
+            <block class="Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Help" name="xpc_settings_help" />
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Magento\Backend\Block\Template" template="Cdev_XPaymentsConnector::settings.phtml" />
+        </referenceContainer>
+        <referenceBlock name="head.components">
+            <block class="Magento\Framework\View\Element\Js\Components" name="sales_page_head_components" template="Magento_Sales::page/js/components.phtml"/>
+        </referenceBlock>
+    </body>
+</page>

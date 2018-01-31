@@ -1,0 +1,89 @@
+<?php
+// vim: set ts=4 sw=4 sts=4 et:
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with block package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at block URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * @author     Qualiteam Software <info@x-cart.com>
+ * @category   Cdev
+ * @package    Cdev_XPaymentsConnector
+ * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+?>
+<?php
+/**
+ * @see Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\Welcome
+ */
+?>
+
+<div class="payment-description">
+
+  <div class="payment-logo">
+    <img src="<?php echo $block->escapeUrl($block->getImageUrl('xpc-logo.png')); ?>" alt="X-Payments Connector"/>
+  </div>
+
+  <div class="description-block">
+    <?php echo $block->escapeHtml($block->getDescription()); ?>
+  </div>
+
+  <div class="pci-logo"></div>
+
+</div>
+
+<h3 class="connect-caption">
+  <?php echo $block->escapeHtml(__('Connect to X-Payments. Complete 3 easy steps.')); ?>
+</h3>
+
+<div class="payment-step">
+
+  <div class="step">
+    <span class="step-number">1</span>
+    <p>
+      <?php echo $block->escapeHtml(__('Open your X-Payments dashboard or')); ?>
+    </p>
+    <button onclick="javascript: window.open('<?php /* @noEscape */ echo $block->escapeJs($block->escapeUrl($block->getTrialDemoUrl())); ?>');">
+      <?php echo $block->escapeHtml(__('Start FREE Trial')); ?>
+    </button>
+  </div>
+
+  <img src="<?php echo $block->escapeUrl($block->getImageUrl('step-arrow.png')); ?>" class="step-arrow" />
+
+  <div class="step">
+    <span class="step-number">2</span>
+    <p>
+      <?php echo $block->escapeHtml(__('Configure your gateway in')); ?>
+      <strong style="white-space: nowrap;"><?php echo $block->escapeHtml(__('X-Payments')); ?></strong>
+    </p>
+    <a href="<?php echo $block->escapeUrl($block->getUserManualGatewaysUrl()); ?>" target="_blank"><?php echo $block->escapeHtml(__('See how')); ?></a>
+  </div>
+
+  <img src="<?php echo $block->escapeUrl($block->getImageUrl('step-arrow.png')); ?>" class="step-arrow" />
+
+  <div class="step">
+    <span class="step-number">3</span>
+    <p>
+      <a href="<?php /* @noEscape */ echo $block->getConnectionTabUrl(); ?>" id="connect-link" title="<?php echo $block->escapeHtmlAttr(__('Go to Connection settings tab')); ?>">
+        <?php echo $block->escapeHtml(__('Connect')); ?>
+        <strong><?php echo $block->escapeHtml(__('X-Payments')); ?></strong>
+        <?php echo $block->escapeHtml(__('with')); ?>
+        <strong><?php echo $block->escapeHtml(__('Magento')); ?></strong>
+      </a>
+    </p>
+    <a href="<?php echo $block->escapeUrl($block->getUserManualMagentoUrl()); ?>" target="_blank"><?php echo $block->escapeHtml(__('See how')); ?></a>
+  </div>
+
+</div>
+
+<div class="video">
+  <iframe width="560" height="315" src="<?php echo $block->escapeUrl($block->getVideoUrl()); ?>" frameborder="0" allowfullscreen></iframe>
+</div>

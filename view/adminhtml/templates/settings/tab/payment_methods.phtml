@@ -1,0 +1,165 @@
+<?php
+// vim: set ts=2 sw=2 sts=2 et:
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with block package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at block URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * @author     Qualiteam Software <info@x-cart.com>
+ * @category   Cdev
+ * @package    Cdev_XPaymentsConnector
+ * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+?>
+<?php
+/**
+ * @see Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\PaymentMethods
+ */
+?>
+
+<div class="fieldset-wrapper-title">
+  <strong class="title"><?php echo $block->escapeHtml(__('Payment configurations')); ?></strong>
+</div>
+
+
+<form action="<?php echo $block->escapeUrl($block->getUrl('xpc/settings/paymentmethods')); ?>" method="post" name="update_form" id="payment-methods-form">
+  <?php echo $block->getBlockHtml('formkey'); ?>
+  <input type="hidden" name="mode" value="update" id="payment-method-form-mode" />
+
+  <div class="grid">
+    <table cellpadding="5" cellspacing="1" class="data-table">
+
+      <tr class="headings">
+        <th></th>
+        <th><?php echo $block->escapeHtml(__('Payment method')); ?></th>
+        <th class="currency"><?php echo $block->escapeHtml(__('Currency')); ?></th>
+        <?php if ($block->isCanSaveCards()): ?>
+          <th class="save-cards"><?php echo $block->escapeHtml(__('Save cards')); ?></th>
+        <?php endif; ?>
+      </tr>
+
+      <?php foreach ($block->getPaymentMethods() as $pm): ?>
+        <tr class="<?php echo $block->escapeHtmlAttr($pm['active_radio']['class']); ?>">
+          <td class="active">
+            <?php echo $block->getRadioHtml($pm['active_radio']); ?>
+          </td>
+          <td colspan="<?php echo (int)$pm['colspan']; ?>">
+            <label for="<?php echo $block->escapeHtmlAttr($pm['active_radio']['id']); ?>">
+              <?php echo $block->escapeHtml($pm['name']); ?>
+            </label>
+          </td>
+          <?php if ($pm['confid']): ?>
+            <td class="currency"><?php echo $block->escapeHtml($pm['currency']); ?></td>
+            <?php if ($block->isCanSaveCards()): ?>
+              <td class="save-cards">
+                <?php if ('Y' == $pm['can_save_cards']): ?>
+                  <?php echo $block->getCheckboxHtml($pm['savecard_checkbox']); ?>
+                <?php endif; ?>
+              </td>
+            <?php endif; ?>
+          <?php endif; ?>
+        </tr>
+      <?php endforeach; ?>
+
+    </table>
+  </div>
+
+  <?php foreach ($block->getPaymentMethods(false) as $pm): ?>
+    <div class="entry-edit" style="display: none;" id="<?php echo $block->escapeHtmlAttr($pm['payment_method']['id']); ?>">
+      <div class="entry-edit-head">
+        <h4><?php echo $block->escapeHtml($pm['name']); ?></h4>
+      </div>
+      <fieldset>
+        <table cellspacing="0" class="form-list">
+
+          <tr>
+            <td class="label"><?php echo $block->escapeHtml(__('Title')); ?></td>
+            <td class="value">
+              <?php echo $block->getInputHtml($pm['payment_method']['title']); ?>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="label"><?php echo $block->escapeHtml(__('Use forced Authorize operation')); ?></td>
+            <td class="value">
+              <?php echo $block->getSelectboxHtml($pm['payment_method']['use_authorize']); ?>
+              <p class="note">
+                <?php echo $block->escapeHtml(__('Work only for non recurring product order.')); ?>
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="label"><?php echo $block->escapeHtml(__('Use forced Authorize operation for recurring products')); ?></td>
+            <td class="value">
+              <?php echo $block->getSelectboxHtml($pm['payment_method']['use_initialfee_authorize']); ?>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="label"><?php echo $block->escapeHtml(__('Sort order')); ?></td>
+            <td class="value">
+              <?php echo $block->getInputHtml($pm['payment_method']['sort_order']); ?>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="label"><?php echo $block->escapeHtml(__('Payment from applicable countries')); ?></td>
+            <td class="value">
+              <?php echo $block->getSelectboxHtml($pm['payment_method']['allowspecific']); ?>
+            </td>
+          </tr>
+
+          <tr class="specificcountry hidden">
+            <td class="label"><?php echo $block->escapeHtml(__('Payment from Specific countries')); ?></td>
+            <td class="value">
+              <?php echo $block->getSelectboxHtml($pm['payment_method']['specificcountry']); ?>
+            </td>
+          </tr>
+
+        </table>
+        <?php echo $block->getChildHtml('updateButton'); ?>
+      </fieldset>
+    </div>
+  <?php endforeach; ?>
+
+    <div class="entry-edit" style="display: none;" id="payment-method-savedcards">
+      <div class="entry-edit-head">
+        <h4><?php echo $block->escapeHtml(__('Use saved credit card')); ?></h4>
+      </div>
+      <fieldset>
+        <table cellspacing="0" class="form-list">
+
+          <tr>
+            <td class="label"><?php echo $block->escapeHtml(__('Title')); ?></td>
+            <td class="value">
+              <input type="text" name="savedcards_title" value="<?php echo $block->escapeHtmlAttr($block->getSettings()->getSavedCardsConfig('title')); ?>" class="input-text" />
+            </td>
+          </tr>
+
+          <tr>
+            <td class="label"><?php echo $block->escapeHtml(__('Sort order')); ?></td>
+            <td class="value">
+              <input type="text" name="savedcards_sort_order" value="<?php echo $block->escapeHtmlAttr($block->getSettings()->getSavedCardsConfig('sort_order')); ?>" class="input-text" />
+            </td>
+          </tr>
+
+        </table>
+        <?php echo $block->getChildHtml('updateButton'); ?>
+      </fieldset>
+    </div>
+
+
+  <?php echo $block->getChildHtml('updateButton'); ?>
+  <?php echo $block->getChildHtml('importButton'); ?>
+  <a href="<?php echo $block->escapeUrl($block->getAddNewPaymentMethodUrl()); ?>" target="_blank"><?php echo $block->escapeHtml(__('Add new payment method')); ?></a>
+</form>

@@ -1,0 +1,107 @@
+<?php
+// vim: set ts=2 sw=2 sts=2 et:
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with block package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at block URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * @author     Qualiteam Software <info@x-cart.com>
+ * @category   Cdev
+ * @package    Cdev_XPaymentsConnector
+ * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+?>
+<?php
+/**
+ * @see Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\Connection
+ */
+?>
+
+<div class="entry-edit">
+
+  <div class="fieldset-wrapper-title">
+    <strong class="title"><?php echo $block->escapeHtml(__('X-Payments configuration bundle')); ?></strong>
+  </div>
+  <div class="fieldset-wrapper">
+    <p>
+      <?php echo $block->escapeHtml(__('Copy the Configuration bundle from Online Store Details page in your X-Payments dashboard, paste it here and click')); ?>
+      <strong><?php echo $block->escapeHtml(__('Deploy.')); ?></strong>
+      <br/>
+      <?php echo $block->escapeHtml(__('Connection will be completed automatically.')); ?>
+    </p>
+    <form action="<?php echo $block->escapeUrl($block->getDeployFormAction()); ?>" method="post" name="deploy_form" onsubmit="javascript: return checkEmptyBundle();">
+      <?php echo $block->getBlockHtml('formkey'); ?>
+      <input type="text" name="bundle" id="xpc-bundle" />
+      <?php echo $block->getChildHtml('deployButton'); ?>
+    </form>
+  </div>
+
+  <?php if (!$block->isWelcomeMode()): ?> 
+    <div class="fieldset-wrapper-title">
+      <strong class="title"><?php echo $block->escapeHtml(__('Settings')); ?></strong>
+    </div>
+    <form action="<?php echo $block->escapeUrl($block->getUpdateFormAction()); ?>" method="post" name="update_form">
+      <?php echo $block->getBlockHtml('formkey'); ?>
+      <div class="fieldset-wrapper">
+        <fieldset class="admin__fieldset">
+
+          <div class="admin__field">
+            <label class="admin__field-label">
+              <span><?php echo $block->escapeHtml(__('X-Payments URL')); ?></span>
+            </label>
+            <div class="admin__field-control">
+              <span id="xpay-url" class="admin__control-text">
+                <?php echo $block->escapeUrl($block->getSettings()->getXpcConfig('url')); ?>
+              </span>
+            </div>
+          </div>
+
+          <div class="admin__field">
+            <label class="admin__field-label">
+              <span><?php echo $block->escapeHtml(__('IP addresses for X-Payments callbacks')); ?></span>
+            </label>
+            <div class="admin__field-control">
+              <input type="text" name="server_ip" class="admin__control-text" value="<?php echo $block->escapeHtmlAttr($block->getSettings()->getXpcConfig('server_ip')); ?>" />
+            </div>
+          </div>
+
+          <div class="admin__field">
+            <label class="admin__field-label">
+              <span><?php echo $block->escapeHtml(__('Payment method title')); ?></span>
+            </label>
+            <div class="admin__field-control">
+              <input type="text" name="title" class="admin__control-text" value="<?php echo $block->escapeHtmlAttr($block->getSettings()->getPaymentConfig('title')); ?>" />
+            </div>
+          </div>
+
+          <div class="admin__field">
+            <label class="admin__field-label">
+              <span><?php echo $block->escapeHtml(__('Payment action')); ?></span>
+            </label>
+            <div class="admin__field-control">
+              <?php echo $block->getSelectBoxHtml($block->getPaymentActionData()); ?>
+            </div>
+          </div>
+
+          <div class="admin__field">
+            <label class="admin__field-label"></label>
+            <div class="admin__field-control">
+              <?php echo $block->getChildHtml('updateButton'); ?>
+            </div>
+          </div>
+
+        </fieldset>
+      </div>
+    </form>
+  <?php endif; ?>
+
+</div>

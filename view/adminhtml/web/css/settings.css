@@ -1,0 +1,186 @@
+/**
+ vim: set ts=4 sw=4 sts=4 et:
+ * X-Payments Connector Settings
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * @author     Qualiteam Software <info@x-cart.com>
+ * @category   Cdev
+ * @package    Cdev_XPaymentsConnector
+ * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+.payment-description {
+    margin: 39px auto 20px;
+    padding: 20px;
+    border: 2px dashed #d6d6d6;
+    border-radius: 7px;
+    box-shadow: 0 0 5px 0 rgba(2, 3, 3, 0.1);
+    max-width: 800px;
+    position: relative;
+}
+
+.payment-description .payment-logo {
+    height: 62px;
+    width: 150px;
+    float: left;
+    padding-top: 11px;
+    padding-right: 25px;
+}
+
+.payment-description .payment-logo img {
+    width: 150px;
+    height: 62px;
+}
+
+.payment-description .pci-logo {
+    background: url(../images/pci-dss-compliance.png);
+    width: 100px;
+    height: 48px;
+    position: absolute;
+    right: -37px;
+    top: -28px;
+}
+
+.payment-description .description-block {
+    font-size: 14px;
+}
+
+h3.connect-caption {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.payment-step {
+    padding: 28px 0 0;
+    width: 625px;
+    margin: 0 auto;
+}
+
+.payment-step .step {
+    position: relative;
+    max-width: 186px;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+}
+
+.payment-step .step-arrow {
+    width: 30px;
+    height: 11px;
+    display: inline-block;
+    margin: 1px -2px;
+    vertical-align: top;
+    padding-top: 16px;
+
+}
+
+.payment-step .step:last-child:before {
+    display: none;
+}
+
+.payment-step .step-number {
+    display: inline-block;
+    margin: 0 0 13px;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #cccccc;
+    border-radius: 50%;
+    font: bold 20px/43px Arial, Helvetica, sans-serif;
+}
+
+.payment-step p {
+    margin: 0 0 20px;
+}
+
+#connect-link {
+    text-decoration: none;
+    border-bottom: 1px dotted;
+    color: #2f2f2f;
+}
+
+.video {
+    margin: 50px auto;
+    width: 560px;
+}
+
+.help-link {
+    padding: .3em 0.5em .28em 1.5em;
+    margin-top: 1em;
+}
+
+/**
+ * Connection settings
+ */
+#xpc-bundle {
+    width: 500px;
+}
+
+#settings_xpc td.value,
+#settings_xpc p.note {
+    width: auto;
+}
+
+/**
+ * Payment methods
+ */
+#payment-methods-form label {
+    cursor: pointer;
+    display: inline-block;
+    width: 100%;
+}
+
+#payment-methods-form tr.disabled {
+    background-color: #ececec;
+}
+
+#payment-methods-form tr.disabled label {
+    color: #555;
+}
+
+tr.specificcountry.hidden {
+    display: none;
+}
+
+button.gray,
+button.gray:hover {
+    border-color: #ccc #aaa #aaa #ccc;
+    background-color: #fff;
+    /* TODO: correct or remove */
+    background-image: url(../../skin/adminhtml/default/default/images/btn_back_bg.gif);
+    color: #555;
+}
+
+td.active,
+td.save-cards,
+th.save-cards,
+td.currency,
+th.currency {
+    text-align: center;
+}
+
+td.actions {
+    padding: 15px !important;
+}
+
+td.actions button {
+    margin-right: 15px;
+}
+
+/**
+ * System config
+ */
+.xpc-group #connect-link {
+    text-decoration: underline;
+    border-bottom: none;
+    color: #2f2f2f;
+}
