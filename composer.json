@@ -1,22 +1,28 @@
 {
-      "name": "cdev/x-payments-connector",
-      "description": "X-Payments connector. This extension integrates Magento 2 with X-Payments - a PA-DSS certified payment module.",
-      "type": "magento2-module",
-      "version": "1.0.0",
-      "license": [
+    "name": "cdev/x-payments-connector",
+    "description": "X-Payments connector. This extension integrates Magento 2 with X-Payments - a PA-DSS certified payment module.",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": [
         "OSL-3.0",
         "AFL-3.0"
-      ],
-      "require": {
+    ],
+    "require": {
         "php": "7.0.2|7.0.4|~7.0.6|7.1.0|7.1.1|7.1.2|7.1.3|7.1.4|7.1.5|7.1.6|7.1.7|7.1.8",
         "magento/module-payment": "100.1.*",
         "magento/module-checkout": "100.1.*",
         "magento/module-sales": "100.1.*"
-      },
-      "autoload": {
+    },
+    "autoload": {
         "files": [ "registration.php" ],
         "psr-4": {
-          "Cdev\\XPaymentsConnector\\": ""
+            "Cdev\\XPaymentsConnector\\": ""
         }
-      }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/xpayments/m2-connector"
+        }
+    ]
 }
