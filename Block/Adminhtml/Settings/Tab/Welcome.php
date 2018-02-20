@@ -14,23 +14,23 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   Cdev
- * @package    Cdev_XPaymentsConnector
+ * @category   XPay
+ * @package    XPay_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tab;
+namespace XPay\XPaymentsConnector\Block\Adminhtml\Settings\Tab;
 
 /**
  * X-Payments Connector Welcome tab
  */
-class Welcome extends \Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tab
+class Welcome extends \XPay\XPaymentsConnector\Block\Adminhtml\Settings\Tab
 {
     /**
      * Current tab
      */
-    protected $tab = \Cdev\XPaymentsConnector\Helper\Settings::TAB_WELCOME;
+    protected $tab = \XPay\XPaymentsConnector\Helper\Settings::TAB_WELCOME;
 
     /**
      * Determines whether to display the tab
@@ -99,14 +99,14 @@ class Welcome extends \Cdev\XPaymentsConnector\Block\Adminhtml\Settings\Tab
         if ($this->getIsSystemConfig()) {
 
             $tab = $this->helper->settings->isConfigured()
-                ? \Cdev\XPaymentsConnector\Helper\Settings::TAB_PAYMENT_METHODS
-                : \Cdev\XPaymentsConnector\Helper\Settings::TAB_CONNECTION;
+                ? \XPay\XPaymentsConnector\Helper\Settings::TAB_PAYMENT_METHODS
+                : \XPay\XPaymentsConnector\Helper\Settings::TAB_CONNECTION;
 
             $url = $this->getUrl('xpc/settings/index', array('active_tab' => $tab));
 
         } else {
 
-            $url = 'javascript: goToTab("' . \Cdev\XPaymentsConnector\Helper\Settings::TAB_CONNECTION . '");';
+            $url = 'javascript: goToTab("' . \XPay\XPaymentsConnector\Helper\Settings::TAB_CONNECTION . '");';
         }
 
         // TODO use native escaper

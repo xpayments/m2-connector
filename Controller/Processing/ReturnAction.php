@@ -14,13 +14,13 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   Cdev
- * @package    Cdev_XPaymentsConnector
+ * @category   XPay
+ * @package    XPay_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace Cdev\XPaymentsConnector\Controller\Processing;
+namespace XPay\XPaymentsConnector\Controller\Processing;
 
 /**
  * Return from payment form (in iframe)
@@ -54,8 +54,8 @@ class ReturnAction extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Framework\Controller\ResultFactory $resultFactory
      * @param \Magento\Checkout\Model\Session $session
-     * @param \Cdev\XPaymentsConnector\Helper\Data $helper
-     * @param \Cdev\XPaymentsConnector\Model\QuoteDataFactory $quoteFactory
+     * @param \XPay\XPaymentsConnector\Helper\Data $helper
+     * @param \XPay\XPaymentsConnector\Model\QuoteDataFactory $quoteFactory
      *
      * @return void
      */
@@ -64,8 +64,8 @@ class ReturnAction extends \Magento\Framework\App\Action\Action
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Framework\Controller\ResultFactory $resultFactory,
         \Magento\Checkout\Model\Session $session,
-        \Cdev\XPaymentsConnector\Helper\Data $helper,
-        \Cdev\XPaymentsConnector\Model\QuoteDataFactory $quoteFactory
+        \XPay\XPaymentsConnector\Helper\Data $helper,
+        \XPay\XPaymentsConnector\Model\QuoteDataFactory $quoteFactory
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->resultFactory = $resultFactory;

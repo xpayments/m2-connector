@@ -14,13 +14,13 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   Cdev
- * @package    Cdev_XPaymentsConnector
+ * @category   XPay
+ * @package    XPay_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace Cdev\XPaymentsConnector\Model\ResourceModel;
+namespace XPay\XPaymentsConnector\Model\ResourceModel;
 
 /**
  * XPC config data model resource
@@ -40,12 +40,12 @@ class ConfigData extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     /**
      * Load data by name
      *
-     * @param \Cdev\XPaymentsConnector\Model\ConfigData $model
+     * @param \XPay\XPaymentsConnector\Model\ConfigData $model
      * @param string $name Name
      *
      * @return int
      */
-    public function loadByName(\Cdev\XPaymentsConnector\Model\ConfigData $model, $name)
+    public function loadByName(\XPay\XPaymentsConnector\Model\ConfigData $model, $name)
     {
         $table = $this->getMainTable();
         $connection = $this->getConnection();

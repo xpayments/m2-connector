@@ -14,13 +14,13 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   Cdev
- * @package    Cdev_XPaymentsConnector
+ * @category   XPay
+ * @package    XPay_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace Cdev\XPaymentsConnector\Helper;
+namespace XPay\XPaymentsConnector\Helper;
 
 /**
  * X-Payments Connector helper
@@ -51,22 +51,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Cdev\XPaymentsConnector\Logger\Logger $logger
-     * @param \Cdev\XPaymentsConnector\Helper\Api $api
-     * @param \Cdev\XPaymentsConnector\Helper\Address $address
-     * @param \Cdev\XPaymentsConnector\Helper\Cart $cart
-     * @param \Cdev\XPaymentsConnector\Helper\Settings $settings
+     * @param \XPay\XPaymentsConnector\Logger\Logger $logger
+     * @param \XPay\XPaymentsConnector\Helper\Api $api
+     * @param \XPay\XPaymentsConnector\Helper\Address $address
+     * @param \XPay\XPaymentsConnector\Helper\Cart $cart
+     * @param \XPay\XPaymentsConnector\Helper\Settings $settings
      *
      * @return void
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Cdev\XPaymentsConnector\Logger\Logger $logger,
-        \Cdev\XPaymentsConnector\Helper\Api $api,
-        \Cdev\XPaymentsConnector\Helper\Address $address,
-        \Cdev\XPaymentsConnector\Helper\Cart $cart,
-        \Cdev\XPaymentsConnector\Helper\Settings $settings
+        \XPay\XPaymentsConnector\Logger\Logger $logger,
+        \XPay\XPaymentsConnector\Helper\Api $api,
+        \XPay\XPaymentsConnector\Helper\Address $address,
+        \XPay\XPaymentsConnector\Helper\Cart $cart,
+        \XPay\XPaymentsConnector\Helper\Settings $settings
     ) {
         parent::__construct($context);
 

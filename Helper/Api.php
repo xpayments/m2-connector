@@ -14,13 +14,13 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   Cdev
- * @package    Cdev_XPaymentsConnector
+ * @category   XPay
+ * @package    XPay_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
  
-namespace Cdev\XPaymentsConnector\Helper;
+namespace XPay\XPaymentsConnector\Helper;
 
 /**
  * Helper for API
@@ -105,7 +105,7 @@ class Api extends AbstractHelper
     private function request($target, $action, array $data = array())
     {
         // TODO: They say it's bad: http://devdocs.magento.com/guides/v2.0/extension-dev-guide/depend-inj.html#rules-for-using-dependency-injection
-        $apiResponse = new \Cdev\XPaymentsConnector\Transport\ApiResponse;
+        $apiResponse = new \XPay\XPaymentsConnector\Transport\ApiResponse;
 
         $data['target'] = $target;
         $data['action'] = $action;
@@ -504,7 +504,7 @@ class Api extends AbstractHelper
      * @param string $error Error message (if any)
      * @param string $code Error code (if any)
      *
-     * @return \Cdev\XPaymentsConnector\Transport\ApiResponse
+     * @return \XPay\XPaymentsConnector\Transport\ApiResponse
      */
     public function testConnection($apiVersion)
     {
@@ -571,7 +571,7 @@ class Api extends AbstractHelper
      *
      * @param array $data Request data
      *
-     * @return \Cdev\XPaymentsConnector\Transport\ApiResponse
+     * @return \XPay\XPaymentsConnector\Transport\ApiResponse
      */
     public function initPayment($data)
     {
@@ -594,7 +594,7 @@ class Api extends AbstractHelper
      * @param boolean $refresh Refresh data flag
      * @param boolean $withAdditionalInfo Flag for additional info
      *
-     * @return \Cdev\XPaymentsConnector\Transport\ApiResponse
+     * @return \XPay\XPaymentsConnector\Transport\ApiResponse
      */
     public function requestPaymentInfo($txnId, $refresh = false, $withAdditionalInfo = false)
     {
@@ -622,7 +622,7 @@ class Api extends AbstractHelper
      * @param string  $txnId  X-Payments transaction id
      * @param float   $amount Amount
      *
-     * @return Cdev_XPaymentsConnector_Transport_ApiResponse
+     * @return XPay_XPaymentsConnector_Transport_ApiResponse
      */
     public function requestPaymentCapture($txnId, $amount = false)
     {
@@ -643,7 +643,7 @@ class Api extends AbstractHelper
      * @param string  $txnId  X-Payments transaction id
      * @param float   $amount Amount
      *
-     * @return Cdev_XPaymentsConnector_Transport_ApiResponse
+     * @return XPay_XPaymentsConnector_Transport_ApiResponse
      */
     public function requestPaymentVoid($txnId, $amount = false)
     {
@@ -664,7 +664,7 @@ class Api extends AbstractHelper
      * @param string  $txnId  X-Payments transaction id
      * @param float   $amount Amount
      *
-     * @return Cdev_XPaymentsConnector_Transport_ApiResponse
+     * @return XPay_XPaymentsConnector_Transport_ApiResponse
      */
     public function requestPaymentRefund($txnId, $amount = false)
     {

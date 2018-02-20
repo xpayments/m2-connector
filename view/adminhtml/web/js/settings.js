@@ -13,8 +13,8 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author Qualiteam Software <info@x-cart.com>
- * @category   Cdev
- * @packageCdev_XPaymentsConnector
+ * @category   XPay
+ * @packageXPay_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @licensehttp://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */

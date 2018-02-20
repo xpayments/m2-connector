@@ -14,13 +14,13 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   Cdev
- * @package    Cdev_XPaymentsConnector
+ * @category   XPay
+ * @package    XPay_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace Cdev\XPaymentsConnector\Model\ResourceModel;
+namespace XPay\XPaymentsConnector\Model\ResourceModel;
 
 /**
  * XPC quote data model resource
@@ -40,12 +40,12 @@ class QuoteData extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     /**
      * Load quote data by quote_id and conf_id
      *
-     * @param \Cdev\XPaymentsConnector\Model\QuoteData $model
+     * @param \XPay\XPaymentsConnector\Model\QuoteData $model
      * @param string $name Name
      *
      * @return int
      */
-    public function loadByConf(\Cdev\XPaymentsConnector\Model\QuoteData $model, $quoteId, $confId)
+    public function loadByConf(\XPay\XPaymentsConnector\Model\QuoteData $model, $quoteId, $confId)
     {
         $table = $this->getMainTable();
         $connection = $this->getConnection();

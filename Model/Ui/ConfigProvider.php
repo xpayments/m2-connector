@@ -14,16 +14,16 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   Cdev
- * @package    Cdev_XPaymentsConnector
+ * @category   XPay
+ * @package    XPay_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace Cdev\XPaymentsConnector\Model\Ui;
+namespace XPay\XPaymentsConnector\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
-use Cdev\XPaymentsConnector\Gateway\Http\Client\ClientMock;
+use XPay\XPaymentsConnector\Gateway\Http\Client\ClientMock;
 
 /**
  * Class ConfigProvider

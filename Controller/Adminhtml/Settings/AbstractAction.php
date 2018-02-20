@@ -14,13 +14,13 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   Cdev
- * @package    Cdev_XPaymentsConnector
+ * @category   XPay
+ * @package    XPay_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace Cdev\XPaymentsConnector\Controller\Adminhtml\Settings;
+namespace XPay\XPaymentsConnector\Controller\Adminhtml\Settings;
 
 /**
  * Abstract class for X-Payments Connector configuration
@@ -50,7 +50,7 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
 
     /**
      * Here we count the active payment configurations during the update payment metods action.
-     * Value should not exceed Cdev_XPaymentsConnector_Helper_Settings_Data::MAX_SLOTS
+     * Value should not exceed XPay_XPaymentsConnector_Helper_Settings_Data::MAX_SLOTS
      */
     private $activeCount = 0;
 
@@ -103,8 +103,8 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
      * @param \Magento\Framework\View\Result\PageFactory $pageFactory
      * @param \Magento\Framework\Controller\ResultFactory $resultFactory
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
-     * @param \Cdev\XPaymentsConnector\Model\PaymentConfigurationFactory $pcFactory
-     * @param \Cdev\XPaymentsConnector\Helper\Data $helper
+     * @param \XPay\XPaymentsConnector\Model\PaymentConfigurationFactory $pcFactory
+     * @param \XPay\XPaymentsConnector\Helper\Data $helper
      *
      * @return void
      */
@@ -113,8 +113,8 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
         \Magento\Framework\View\Result\PageFactory $pageFactory,
         \Magento\Framework\Controller\ResultFactory $resultFactory,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        \Cdev\XPaymentsConnector\Model\PaymentConfigurationFactory $pcFactory,
-        \Cdev\XPaymentsConnector\Helper\Data $helper
+        \XPay\XPaymentsConnector\Model\PaymentConfigurationFactory $pcFactory,
+        \XPay\XPaymentsConnector\Helper\Data $helper
     ) {
         
         $this->pageFactory = $pageFactory;
@@ -137,7 +137,7 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
     private function deactivatePaymentMethods($startSlot = 1)
     {
         // Deactivate
-        for ($xpcSlot = $startSlot; $xpcSlot <= \Cdev\XPaymentsConnector\Helper\Settings::MAX_SLOTS; $xpcSlot++) {
+        for ($xpcSlot = $startSlot; $xpcSlot <= \XPay\XPaymentsConnector\Helper\Settings::MAX_SLOTS; $xpcSlot++) {
             $this->helper->settings->setPaymentConfig('is_active', 0, $xpcSlot);
         }
 
@@ -177,11 +177,11 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
     /**
      * Process data for payment method associated with the payment configuration
      *
-     * @param Cdev_XPaymentsConnector_Model_Paymentconfiguration $paymentConf Payment configuration
+     * @param XPay_XPaymentsConnector_Model_Paymentconfiguration $paymentConf Payment configuration
      *
      * @return void
      */
-    private function processPaymentConfMethod(\Cdev\XPaymentsConnector\Model\Paymentconfiguration $paymentConf)
+    private function processPaymentConfMethod(\XPay\XPaymentsConnector\Model\Paymentconfiguration $paymentConf)
     {
         if ('Y' == $paymentConf->getActive()) {
 
@@ -202,11 +202,11 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
     /**
      * Set value for the payment method data param
      *
-     * @param Cdev_XPaymentsConnector_Model_Paymentconfiguration $paymentConf Payment configuration
+     * @param XPay_XPaymentsConnector_Model_Paymentconfiguration $paymentConf Payment configuration
      *
-     * @return Cdev_XPaymentsConnector_Model_Paymentconfiguration
+     * @return XPay_XPaymentsConnector_Model_Paymentconfiguration
      */
-    protected function setPaymentMethodDataParamValue(\Cdev\XPaymentsConnector\Model\Paymentconfiguration $paymentConf)
+    protected function setPaymentMethodDataParamValue(\XPay\XPaymentsConnector\Model\Paymentconfiguration $paymentConf)
     {
         $confId = $paymentConf->getConfid();
 
@@ -235,18 +235,18 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
     /**
      * Set value for the Active param
      *
-     * @param Cdev_XPaymentsConnector_Model_Paymentconfiguration $paymentConf Payment configuration
+     * @param XPay_XPaymentsConnector_Model_Paymentconfiguration $paymentConf Payment configuration
      *
-     * @return Cdev_XPaymentsConnector_Model_Paymentconfiguration
+     * @return XPay_XPaymentsConnector_Model_Paymentconfiguration
      */
-    protected function setActiveParamValue(\Cdev\XPaymentsConnector\Model\Paymentconfiguration $paymentConf)
+    protected function setActiveParamValue(\XPay\XPaymentsConnector\Model\Paymentconfiguration $paymentConf)
     {
         $confId = $paymentConf->getConfid();
 
         if (
             !isset($this->updateData['is_active'][$confId])
             || true != $this->updateData['is_active'][$confId]
-            || $this->activeCount > \Cdev\XPaymentsConnector\Helper\Settings::MAX_SLOTS
+            || $this->activeCount > \XPay\XPaymentsConnector\Helper\Settings::MAX_SLOTS
         ) {
             $active = false;
         } else {
@@ -420,7 +420,7 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
     {
         $result = $this->defaultPaymentData;
 
-        if ($paymentConf instanceof \Cdev\XPaymentsConnector\Model\PaymentConfiguration) {
+        if ($paymentConf instanceof \XPay\XPaymentsConnector\Model\PaymentConfiguration) {
 
             $result['title'] = 'Credit card (' . $paymentConf->getData('name') . ')';
 
@@ -442,7 +442,7 @@ abstract class AbstractAction extends \Magento\Backend\App\Action
      *
      * @return void
      */
-    protected function redirectToTab($tab = \Cdev\XPaymentsConnector\Helper\Settings::TAB_CONNECTION)
+    protected function redirectToTab($tab = \XPay\XPaymentsConnector\Helper\Settings::TAB_CONNECTION)
     {
         $resultRedirect = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
         $resultRedirect->setPath('xpc/settings/index', array('active_tab' => $tab));

@@ -14,18 +14,18 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   Cdev
- * @package    Cdev_XPaymentsConnector
+ * @category   XPay
+ * @package    XPay_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
  
-namespace Cdev\XPaymentsConnector\Helper;
+namespace XPay\XPaymentsConnector\Helper;
 
 /**
  * Helper for settings
  */
-class Settings extends \Cdev\XPaymentsConnector\Helper\AbstractHelper
+class Settings extends \XPay\XPaymentsConnector\Helper\AbstractHelper
 {
     /**
      * Maximum quantity of the payment methods that can be enabled
@@ -153,7 +153,7 @@ class Settings extends \Cdev\XPaymentsConnector\Helper\AbstractHelper
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
      * @param \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList
-     * @param \Cdev\XPaymentsConnector\Model\ConfigDataFactory $configFactory
+     * @param \XPay\XPaymentsConnector\Model\ConfigDataFactory $configFactory
      *
      * @return void
      */
@@ -162,7 +162,7 @@ class Settings extends \Cdev\XPaymentsConnector\Helper\AbstractHelper
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-        \Cdev\XPaymentsConnector\Model\ConfigDataFactory $configFactory
+        \XPay\XPaymentsConnector\Model\ConfigDataFactory $configFactory
     ) {
         parent::__construct($context);
 
