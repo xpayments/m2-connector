@@ -14,13 +14,13 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   XPay
- * @package    XPay_XPaymentsConnector
+ * @category   CDev
+ * @package    CDev_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
  
-namespace XPay\XPaymentsConnector\Helper;
+namespace CDev\XPaymentsConnector\Helper;
 
 /**
  * Abstract helper class
@@ -47,9 +47,9 @@ abstract class AbstractHelper extends \Magento\Framework\DataObject
     /**
      * Set helper with helpers
      *
-     * @param XPay\XPaymentsConnector\Helper\Data
+     * @param CDev\XPaymentsConnector\Helper\Data
      *
-     * @return XPay\XPaymentsConnector\Helper\AbstractHelper
+     * @return CDev\XPaymentsConnector\Helper\AbstractHelper
      */
     public function setHelper($helper)
     {

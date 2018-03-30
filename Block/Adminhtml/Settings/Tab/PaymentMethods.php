@@ -14,23 +14,23 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   XPay
- * @package    XPay_XPaymentsConnector
+ * @category   CDev
+ * @package    CDev_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace XPay\XPaymentsConnector\Block\Adminhtml\Settings\Tab;
+namespace CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab;
 
 /**
  * X-Payments Connector Payment Methods settings tab
  */
-class PaymentMethods extends \XPay\XPaymentsConnector\Block\Adminhtml\Settings\Tab
+class PaymentMethods extends \CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab
 {
     /**
      * Current tab
      */
-    protected $tab = \XPay\XPaymentsConnector\Helper\Settings::TAB_PAYMENT_METHODS;
+    protected $tab = \CDev\XPaymentsConnector\Helper\Settings::TAB_PAYMENT_METHODS;
 
     /**
      * Determines whether to display the tab
@@ -236,7 +236,7 @@ class PaymentMethods extends \XPay\XPaymentsConnector\Block\Adminhtml\Settings\T
 
                 if (
                     $data['is_active']
-                    && $activeCount < \XPay\XPaymentsConnector\Helper\Settings::MAX_SLOTS
+                    && $activeCount < \CDev\XPaymentsConnector\Helper\Settings::MAX_SLOTS
                 ) {
                     $result[$confId]['active_checkbox'] += array('checked' => 'checked');
                     $result[$confId]['active_radio'] += array('checked' => 'checked');

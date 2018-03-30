@@ -14,13 +14,13 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   XPay
- * @package    XPay_XPaymentsConnector
+ * @category   CDev
+ * @package    CDev_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace XPay\XPaymentsConnector\Controller\Processing;
+namespace CDev\XPaymentsConnector\Controller\Processing;
 
 /**
  * Callback processing
@@ -54,7 +54,7 @@ class Callback extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Framework\Controller\ResultFactory $resultFactory
      * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
-     * @param \XPay\XPaymentsConnector\Helper\Data $helper
+     * @param \CDev\XPaymentsConnector\Helper\Data $helper
      *
      * @return void
      */
@@ -63,7 +63,7 @@ class Callback extends \Magento\Framework\App\Action\Action
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Framework\Controller\ResultFactory $resultFactory,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \XPay\XPaymentsConnector\Helper\Data $helper
+        \CDev\XPaymentsConnector\Helper\Data $helper
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->resultFactory = $resultFactory;

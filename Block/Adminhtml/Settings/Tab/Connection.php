@@ -14,23 +14,23 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   XPay
- * @package    XPay_XPaymentsConnector
+ * @category   CDev
+ * @package    CDev_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace XPay\XPaymentsConnector\Block\Adminhtml\Settings\Tab;
+namespace CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab;
 
 /**
  * X-Payments Connector Connection settings tab
  */
-class Connection extends \XPay\XPaymentsConnector\Block\Adminhtml\Settings\Tab
+class Connection extends \CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab
 {
     /**
      * Current tab
      */
-    protected $tab = \XPay\XPaymentsConnector\Helper\Settings::TAB_CONNECTION;
+    protected $tab = \CDev\XPaymentsConnector\Helper\Settings::TAB_CONNECTION;
 
     /**
      * List of errors

@@ -14,13 +14,13 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   XPay
- * @package    XPay_XPaymentsConnector
+ * @category   CDev
+ * @package    CDev_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace XPay\XPaymentsConnector\Block\Adminhtml\Settings;
+namespace CDev\XPaymentsConnector\Block\Adminhtml\Settings;
 
 /**
  * Abstract class for tab on the settings page
@@ -113,7 +113,7 @@ abstract class Tab extends \Magento\Backend\Block\Template implements \Magento\B
     /**
      * Settings helper
      *
-     * @return \XPay\XPaymentsConnector\Helper\Settings
+     * @return \CDev\XPaymentsConnector\Helper\Settings
      */
     public function getSettings()
     {
@@ -127,7 +127,7 @@ abstract class Tab extends \Magento\Backend\Block\Template implements \Magento\B
      */
     public function getImageUrl($image)
     {
-        return $this->getViewFileUrl('XPay_XPaymentsConnector::images/' . $image);
+        return $this->getViewFileUrl('CDev_XPaymentsConnector::images/' . $image);
     }
 
     /**
@@ -148,8 +148,8 @@ abstract class Tab extends \Magento\Backend\Block\Template implements \Magento\B
      * @param array $data
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
-     * @param \XPay\XPaymentsConnector\Model\PaymentConfigurationFactory $pcFactory
-     * @param \XPay\XPaymentsConnector\Helper\Data $helper
+     * @param \CDev\XPaymentsConnector\Model\PaymentConfigurationFactory $pcFactory
+     * @param \CDev\XPaymentsConnector\Helper\Data $helper
      *
      * @return void
      */
@@ -158,8 +158,8 @@ abstract class Tab extends \Magento\Backend\Block\Template implements \Magento\B
         array $data = array(),
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        \XPay\XPaymentsConnector\Model\PaymentConfigurationFactory $pcFactory,
-        \XPay\XPaymentsConnector\Helper\Data $helper
+        \CDev\XPaymentsConnector\Model\PaymentConfigurationFactory $pcFactory,
+        \CDev\XPaymentsConnector\Helper\Data $helper
     ) {
 
         $this->_template = 'settings/tab/' . $this->tab . '.phtml';

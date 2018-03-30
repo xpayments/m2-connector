@@ -14,13 +14,13 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   XPay
- * @package    XPay_XPaymentsConnector
+ * @category   CDev
+ * @package    CDev_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-namespace XPay\XPaymentsConnector\Model;
+namespace CDev\XPaymentsConnector\Model;
 
 /**
  * Payment Configuration model
@@ -40,7 +40,7 @@ class PaymentConfiguration extends \Magento\Framework\Model\AbstractModel implem
      */
     protected function _construct()
     {
-        $this->_init('XPay\XPaymentsConnector\Model\ResourceModel\PaymentConfiguration');
+        $this->_init('CDev\XPaymentsConnector\Model\ResourceModel\PaymentConfiguration');
     }
 
     /**

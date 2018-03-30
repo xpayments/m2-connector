@@ -15,8 +15,8 @@
  * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * @author     Qualiteam Software <info@x-cart.com>
- * @category   XPay
- * @package    XPay_XPaymentsConnector
+ * @category   CDev
+ * @package    CDev_XPaymentsConnector
  * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -24,6 +24,6 @@
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
 	<menu>
-		<add id="XPay_XPaymentsConnector::settings_index" title="X-Payments Connector" translate="title" module="XPay_XPaymentsConnector" parent="Magento_Backend::stores_settings" sortOrder="100" dependsOnModule="XPay_XPaymentsConnector" action="xpc/settings/index" resource="XPay_XPaymentsConnector::settings" />
+		<add id="CDev_XPaymentsConnector::settings_index" title="X-Payments Connector" translate="title" module="CDev_XPaymentsConnector" parent="Magento_Backend::stores_settings" sortOrder="100" dependsOnModule="CDev_XPaymentsConnector" action="xpc/settings/index" resource="CDev_XPaymentsConnector::settings" />
     </menu>
 </config>
