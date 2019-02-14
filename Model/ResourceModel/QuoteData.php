@@ -38,19 +38,22 @@ class QuoteData extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     }
 
     /**
-     * Load quote data by quote_id and conf_id
+     * Load quote data by Quote ID and Payment configuratiuon ID
      *
-     * @param \CDev\XPaymentsConnector\Model\QuoteData $model
-     * @param string $name Name
+     * @param $quoteId Quote ID
+     * @param $confId Payment configuratiuon ID
      *
      * @return int
      */
-    public function loadByConf(\CDev\XPaymentsConnector\Model\QuoteData $model, $quoteId, $confId)
+    public function loadByQuoteAndConf($quoteId, $confId)
     {
         $table = $this->getMainTable();
         $connection = $this->getConnection();
 
-        $select = $connection->select()->from($table, array('id'))->where('quote_id = ?', $quoteId)->where('conf_id = ?', $confId);
+        $select = $connection->select()
+            ->from($table, array('id'))
+            ->where('quote_id = ?', $quoteId)
+            ->where('conf_id = ?', $confId);
 
         $id = $connection->fetchOne($select);
 

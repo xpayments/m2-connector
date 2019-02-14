@@ -30,7 +30,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Current URL
      */
-    private $url;
+    protected $url;
+
+    /**
+     * Store Manager
+     */
+    protected $storeManager = null;
 
     /**
      * Logger
@@ -47,6 +52,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public $settings = null;
 
     /**
+     * Ignore Only dependency assignment operations are allowed in constructor
+     * @codingStandardsIgnoreStart
+     */
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Helper\Context $context
@@ -58,6 +68,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \CDev\XPaymentsConnector\Helper\Settings $settings
      *
      * @return void
+     *
+     * @SuppressWarnings(MEQP2.Classes.ConstructorOperations.CustomOperationsFound)
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -70,13 +82,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     ) {
         parent::__construct($context);
 
-        // Remove session key from URL
-        $this->url = preg_replace(
-            array('/\/key\/\w+\//', '/\?.*$/'),
-            array('\/', ''),
-            $storeManager->getStore()->getCurrentUrl()
-        );
-
+        $this->storeManager = $storeManager;
         $this->logger = $logger;
 
         $this->api = $api->setHelper($this);
@@ -84,6 +90,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->cart = $cart->setHelper($this);
         $this->settings = $settings->setHelper($this);
     }
+
+    /**
+     * /Ignore Only dependency assignment operations are allowed in constructor
+     * @codingStandardsIgnoreEnd
+     */
 
     /**
      * Format price in 1234.56 format
@@ -95,6 +106,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function preparePrice($price)
     {
         return number_format($price, 2, '.', '');
+    }
+
+    /**
+     * Get current URL
+     *
+     * @return string
+     */
+    protected function getUrl()
+    {
+        if (null !== $this->url) {
+
+            // Remove session key from URL
+            $this->url = preg_replace(
+                array('/\/key\/\w+\//', '/\?.*$/'),
+                array('\/', ''),
+                $storeManager->getStore()->getCurrentUrl()
+            );
+        }
+
+        return $this->url;
     }
 
     /**
@@ -114,7 +145,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $message = PHP_EOL . date('Y-m-d H:i:s') . PHP_EOL
             . $title . PHP_EOL
             . $data . PHP_EOL
-            . $this->url . PHP_EOL;
+            . $this->getUrl() . PHP_EOL;
 
         $this->logger->info($message);
     }
@@ -136,7 +167,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $message = PHP_EOL . date('Y-m-d H:i:s') . PHP_EOL
             . $title . PHP_EOL
             . $data . PHP_EOL
-            . $this->url . PHP_EOL;
+            . $this->getUrl() . PHP_EOL;
 
         $this->logger->debug($message);
     }

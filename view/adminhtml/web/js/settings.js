@@ -53,6 +53,18 @@ function checkEmptyBundle()
 }
 
 /**
+ * Switch allowed countries select-box
+ * 
+ * @return void
+ */
+function switchCountries()
+{
+    var disabled = ('0' == jQuery('#xpc_settings_payment_method_allow_specific').val());
+
+    jQuery('#xpc_settings_payment_method_specific_country').attr('disabled', disabled);
+}
+
+/**
  * Set update form mode parameter
  *
  * @paramm string mode Mode
@@ -62,4 +74,20 @@ function checkEmptyBundle()
 function setFormMode(mode)
 {
     jQuery('input[name="mode"]').val(mode);
+}
+
+/**
+ * Set update form mode parameter
+ *
+ * @paramm string mode Mode
+ *
+ * @return void
+ */
+function submitForm(mode)
+{
+    if ('undefined' != typeof mode) {
+        setFormMode(mode);
+    }
+
+    jQuery('form[name="update_form"]:visible').get(0).submit();
 }

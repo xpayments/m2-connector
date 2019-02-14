@@ -24,6 +24,9 @@ namespace CDev\XPaymentsConnector\Logger;
 
 /**
  * Logger
+ *
+ * @SuppressWarnings(MEQP1.CodeAnalysis.EmptyBlock.DetectedCLASS)
+ * @codingStandardsIgnoreStart
  */
 class Logger extends \Monolog\Logger
 {

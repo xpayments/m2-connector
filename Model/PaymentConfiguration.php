@@ -22,6 +22,8 @@
 
 namespace CDev\XPaymentsConnector\Model;
 
+use CDev\XPaymentsConnector\Controller\RegistryConstants;
+
 /**
  * Payment Configuration model
  */
@@ -29,9 +31,56 @@ class PaymentConfiguration extends \Magento\Framework\Model\AbstractModel implem
 {
     /**
      * Cache tag
-     * TODO: is it necesary?
      */
     const CACHE_TAG = 'xpc_payment_configuration';
+
+    /**
+     * Cache tag
+     */
+    protected $_cacheTag = self::CACHE_TAG;
+
+    /**
+     * Event prefix
+     */
+    protected $_eventPrefix = 'xpc_payment_configuration';
+
+    /**
+     * Core registry
+     */
+    protected $coreRegistry = null;
+
+    /**
+     * Payment Card collection factory
+     */
+    protected $paymentConfigurationCollectionFactory = null;
+
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $coreRegistry
+     * @param \CDev\XPaymentsConnector\Model\ResourceModel\PaymentConfiguration\CollectionFactory $paymentConfigurationCollectionFactory
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
+     * @param array $data
+     *
+     * @return void
+     */
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $coreRegistry,
+        \CDev\XPaymentsConnector\Model\ResourceModel\PaymentConfiguration\CollectionFactory $paymentConfigurationCollectionFactory,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = array()
+    ) {
+
+        $this->paymentConfigurationCollectionFactory = $paymentConfigurationCollectionFactory;
+
+        parent::__construct($context, $coreRegistry, $resource, $resourceCollection, $data);
+
+        $this->coreRegistry = $coreRegistry;
+    }
 
     /**
      * Constructor
@@ -53,5 +102,32 @@ class PaymentConfiguration extends \Magento\Framework\Model\AbstractModel implem
         return array(
             self::CACHE_TAG . '_' . $this->getId()
         );
+    }
+
+    /**
+     * Get default values
+     *
+     * @return array
+     */
+    public function getDefaultValues()
+    {
+        $values = array();
+
+        return $values;
+    }
+
+    /**
+     * Get payment configurations collection for current store
+     *
+     * @return \CDev\XPaymentsConnector\Model\ResourceModel\PaymentConfiguration\Collection
+     */
+    public function getCurrentStoreCollection()
+    {
+        $storeId = (int)$this->coreRegistry->registry(RegistryConstants::CURRENT_STORE_ID);
+
+        $collection = $this->paymentConfigurationCollectionFactory->create();
+        $collection->addFieldToFilter('store_id', $storeId);
+
+        return $collection;
     }
 }

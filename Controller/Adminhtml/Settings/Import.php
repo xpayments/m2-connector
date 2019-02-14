@@ -25,7 +25,7 @@ namespace CDev\XPaymentsConnector\Controller\Adminhtml\Settings;
 /**
  * Import payment methods action
  */
-class Import extends AbstractAction
+class Import extends \CDev\XPaymentsConnector\Controller\Adminhtml\Settings
 {
     /**
      * Load the page defined in view/adminhtml/layout/xpc_settings_index.xml
@@ -34,14 +34,16 @@ class Import extends AbstractAction
      */
     public function execute()
     {
+        $this->initCurrentStoreId();
+
         $redirect = $this->redirectToTab($this->helper->settings::TAB_PAYMENT_METHODS);
 
         try {
 
             if ($this->helper->settings->isConfigured()) {
+
                 $this->importPaymentMethods();
-                // TODO: implement
-                // $this->autoActivateZeroAuth();
+                $this->autoActivateZeroAuth();
             }
 
         } catch (\Exception $e) {

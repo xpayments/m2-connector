@@ -22,6 +22,8 @@
 
 namespace CDev\XPaymentsConnector\Model;
 
+use CDev\XPaymentsConnector\Controller\RegistryConstants;
+
 /**
  * XPC config data model
  */
@@ -29,9 +31,69 @@ class ConfigData extends \Magento\Framework\Model\AbstractModel implements \Mage
 {
     /**
      * Cache tag
-     * TODO: is it necesary?
      */
     const CACHE_TAG = 'xpc_config_data';
+
+    /**
+     * Cache tag
+     */
+    protected $_cacheTag = self::CACHE_TAG;
+
+    /**
+     * Event prefix
+     */
+    protected $_eventPrefix = 'xpc_config_data';
+
+    /**
+     * Core registry
+     */
+    protected $coreRegistry = null;
+
+    /**
+     * App State
+     */
+    protected $appState = null;
+
+    /**
+     * Store ID
+     */
+    protected $storeId = null;
+
+    /**
+     * config collection factory
+     */
+    protected $configCollectionFactory = null;
+
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $coreRegistry
+     * @param \Magento\Framework\App\State $appState
+     * @param \CDev\XPaymentsConnector\Model\ResourceModel\ConfigData\CollectionFactory $configCollectionFactory
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
+     * @param array $data
+     *
+     * @return void
+     */
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $coreRegistry,
+        \Magento\Framework\App\State $appState,
+        \CDev\XPaymentsConnector\Model\ResourceModel\ConfigData\CollectionFactory $configCollectionFactory,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = array()
+    ) {
+
+        $this->configCollectionFactory = $configCollectionFactory;
+
+        parent::__construct($context, $coreRegistry, $resource, $resourceCollection, $data);
+
+        $this->coreRegistry = $coreRegistry;
+        $this->appState = $appState;
+    }
 
     /**
      * Constructor
@@ -44,6 +106,47 @@ class ConfigData extends \Magento\Framework\Model\AbstractModel implements \Mage
     }
 
     /**
+     * Get Store ID (it might be changed to zero)
+     *
+     * @return int
+     */
+    protected function getStoreId()
+    {
+        if (null === $this->storeId) {
+
+            $this->storeId = (int)$this->coreRegistry->registry(RegistryConstants::CURRENT_STORE_ID);
+
+            if (
+                !$this->isConfiguredForStore($this->storeId)
+                && $this->isConfiguredForStore(0)
+            ) {
+
+                // Switch to default store, if it's configured, and the current store is not configured
+                $this->storeId = 0;
+            }
+        }
+
+        return $this->storeId;
+    }
+
+    /**
+     * Check if XPC is configured for store
+     *
+     * @param int $storeId Store ID
+     *
+     * @return \CDev\XPaymentsConnector\Model\ConfigData
+     */
+    protected function isConfiguredForStore($storeId)
+    {
+        $collection = $this->configCollectionFactory->create();
+
+        $collection->addFieldToFilter('name', 'is_configured');
+        $collection->addFieldToFilter('store_id', $storeId);
+
+        return(bool)$collection->getFirstItem()->getValue();
+    }
+
+    /**
      * Load data by name
      *
      * @param string $name Name
@@ -52,8 +155,14 @@ class ConfigData extends \Magento\Framework\Model\AbstractModel implements \Mage
      */
     public function loadByName($name)
     {
-        $id = $this->_getResource()->loadByName($this, $name);
-        return $this->load($id);
+        $storeId = $this->getStoreId();
+
+        $collection = $this->configCollectionFactory->create();
+
+        $collection->addFieldToFilter('name', $name);
+        $collection->addFieldToFilter('store_id', $storeId);
+
+        return $collection->getFirstItem();
     }
 
     /**
@@ -66,5 +175,17 @@ class ConfigData extends \Magento\Framework\Model\AbstractModel implements \Mage
         return array(
             self::CACHE_TAG . '_' . $this->getId()
         );
+    }
+
+    /**
+     * Get default values
+     *
+     * @return array
+     */
+    public function getDefaultValues()
+    {
+        $values = array();
+
+        return $values;
     }
 }

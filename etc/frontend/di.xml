@@ -25,7 +25,8 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="xpc_config_provider" xsi:type="object">CDev\XPaymentsConnector\Model\Ui\ConfigProvider</item>
+                <item name="xpc_config_provider" xsi:type="object">CDev\XPaymentsConnector\Ui\Xpc\ConfigProvider</item>
+                <item name="xpc_payment_card_config_provider" xsi:type="object">CDev\XPaymentsConnector\Ui\PaymentCard\ConfigProvider</item>
             </argument>
         </arguments>
     </type>

@@ -74,6 +74,18 @@ class ApiResponse extends \Magento\Framework\DataObject
     }
 
     /**
+     * Get error message as phrase
+     *
+     * @param string $defaultMessage Default message
+     *
+     * @return \Magento\Framework\Phrase
+     */
+    public function getErrorPhrase($defaultMessage = '')
+    {
+        return __($this->getErrorMessage($defaultMessage));
+    }
+
+    /**
      * Get message
      *
      * @param string $defaultMessage Default message
@@ -89,5 +101,17 @@ class ApiResponse extends \Magento\Framework\DataObject
         }
 
         return $message;
+    }
+
+    /**
+     * Get message as phrase
+     *
+     * @param string $defaultMessage Default message
+     *
+     * @return \Magento\Framework\Phrase
+     */
+    public function getPhrase($defaultMessage = '')
+    {
+        return __($this->getMessage($defaultMessage));
     }
 }

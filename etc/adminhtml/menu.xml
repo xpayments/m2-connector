@@ -21,9 +21,25 @@
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
-
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
-	<menu>
-		<add id="CDev_XPaymentsConnector::settings_index" title="X-Payments Connector" translate="title" module="CDev_XPaymentsConnector" parent="Magento_Backend::stores_settings" sortOrder="100" dependsOnModule="CDev_XPaymentsConnector" action="xpc/settings/index" resource="CDev_XPaymentsConnector::settings" />
+    <menu>
+        <add id="CDev_XPaymentsConnector::settings_index" 
+             title="X-Payments Connector" 
+             translate="title" 
+             module="CDev_XPaymentsConnector"
+             parent="Magento_Backend::stores_settings"
+             sortOrder="100"
+             dependsOnModule="CDev_XPaymentsConnector"
+             action="xpc/settings/index"
+             resource="CDev_XPaymentsConnector::settings" />
+        <add id="CDev_XPaymentsConnector::payment_card_index" 
+             title="Payment Cards"
+             translate="title"
+             module="CDev_XPaymentsConnector"
+             parent="Magento_Customer::customer"
+             sortOrder="100"
+             dependsOnModule="CDev_XPaymentsConnector"
+             action="xpc/payment_card/index"
+             resource="CDev_XPaymentsConnector::payment_card" />
     </menu>
 </config>

@@ -22,6 +22,8 @@
 
 namespace CDev\XPaymentsConnector\Controller\Processing;
 
+use CDev\XPaymentsConnector\Controller\RegistryConstants;
+
 /**
  * Callback processing
  */
@@ -38,9 +40,14 @@ class Callback extends \Magento\Framework\App\Action\Action
     protected $resultFactory = null;
 
     /**
-     * Helpers
+     * XPC Helper
      */
-    private $helper = null;
+    protected $helper = null;
+
+    /**
+     * Core coreRegistry
+     */
+    protected $coreRegistry = null;
 
     /**
      * Quote factory
@@ -63,7 +70,8 @@ class Callback extends \Magento\Framework\App\Action\Action
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Framework\Controller\ResultFactory $resultFactory,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \CDev\XPaymentsConnector\Helper\Data $helper
+        \CDev\XPaymentsConnector\Helper\Data $helper,
+        \Magento\Framework\Registry $coreRegistry
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->resultFactory = $resultFactory;
@@ -73,6 +81,8 @@ class Callback extends \Magento\Framework\App\Action\Action
         $this->quoteFactory = $quoteFactory;
 
         parent::__construct($context);
+
+        $this->coreRegistry = $coreRegistry;
     }
 
     /**
@@ -89,7 +99,14 @@ class Callback extends \Magento\Framework\App\Action\Action
         if ('check_cart' == $this->getRequest()->getParam('action')) {
 
             $quoteId = (int)$this->getRequest()->getParam('quote_id');
+            $storeId = (int)$this->getRequest()->getParam('store_id');
             $quote = $this->quoteFactory->create()->load($quoteId);
+
+            if (!$storeId && $quote->getStoreId()) {
+                $storeId = $quote->getStoreId();
+            }
+
+            $this->coreRegistry->register(RegistryConstants::CURRENT_STORE_ID, $storeId);
 
             if ($quote->getId()) {
 

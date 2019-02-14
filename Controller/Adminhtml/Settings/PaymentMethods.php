@@ -23,17 +23,19 @@
 namespace CDev\XPaymentsConnector\Controller\Adminhtml\Settings;
 
 /**
- * Deploy configuration bundle controller action
+ * Update payment methods controller action
  */
-class PaymentMethods extends AbstractAction
+class PaymentMethods extends \CDev\XPaymentsConnector\Controller\Adminhtml\Settings
 {
     /**
-     * Load the page defined in view/adminhtml/layout/xpc_settings_index.xml
+     * Execute action
      *
      * @return \Magento\Framework\View\Result\Page
      */
     public function execute()
     {
+        $this->initCurrentStoreId();
+
         $redirect = $this->redirectToTab($this->helper->settings::TAB_PAYMENT_METHODS);
 
         $mode = $this->getRequest()->getParam('mode');
@@ -51,12 +53,11 @@ class PaymentMethods extends AbstractAction
                 $this->addSuccessTopMessage('Payment methods import successful');
             }
 
-            // TODO: implement
-            // $this->autoActivateZeroAuth();
+            $this->autoActivateZeroAuth();
 
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
 
-            $this->addErrorTopMessage($e->getMessage());
+            $this->addErrorTopMessage($exception->getMessage());
         }
 
         return $redirect;

@@ -28,37 +28,14 @@ namespace CDev\XPaymentsConnector\Block\Adminhtml\Settings;
 class Tabs extends \Magento\Backend\Block\Widget\Tabs
 {
     /**
-     * Core registry
+     * Constructor
      *
-     * @var \Magento\Framework\Registry
+     * @return void
      */
-    protected $_coreRegistry = null;
-
-    /**
-     * List of tab IDs
-     */
-    private $tabIDs = array();
-
-    /**
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
-     * @param \Magento\Backend\Model\Auth\Session $authSession
-     * @param \Magento\Framework\Registry $registry
-     * @param array $data
-     */
-    public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
-        \Magento\Backend\Model\Auth\Session $authSession,
-        \Magento\Framework\Registry $registry,
-        array $data = array()
-    ) {
-        $this->_coreRegistry = $registry;
-
+    protected function _construct()
+    {
         $this->setId('xpc_settings_tabs');
         $this->setDestElementId('xpc_settings_container');
         $this->setTitle(__('Configuration'));
-        
-        parent::__construct($context, $jsonEncoder, $authSession, $data);
     }
 }

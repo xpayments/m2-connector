@@ -22,16 +22,13 @@
  
 namespace CDev\XPaymentsConnector\Helper;
 
+use CDev\XPaymentsConnector\Controller\RegistryConstants;
+
 /**
  * Helper for settings
  */
 class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
 {
-    /**
-     * Maximum quantity of the payment methods that can be enabled
-     */
-    const MAX_SLOTS = 3;
-
     /**
      * List of tabs
      */
@@ -41,9 +38,8 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     const TAB_ZERO_AUTH       = 'zero_auth';
 
     // Configuration settings path
-    const XPATH_XPC         = 'xpaymentsconnector/settings/';
-    const XPATH_PAYMENT     = 'payment/xpc/';
-    const XPATH_SAVED_CARDS = 'payment/savedcards/';
+    const XPATH_PAYMENT      = 'payment/xpc/';
+    const XPATH_PAYMENT_CARD = 'payment/xpc_payment_card/';
 
     // Validation regexp for serialized bundle
     const BUNDLE_REGEXP = '/a:[56]:{s:8:"store_id";s:\d+:"[0-9a-z]+";s:3:"url";s:\d+:"[^"]+";s:10:"public_key";s:\d+:"-----BEGIN CERTIFICATE-----[^"]+-----END CERTIFICATE-----";s:11:"private_key";s:\d+:"-----BEGIN [A-Z ]*PRIVATE KEY-----[^"]+-----END [A-Z ]*PRIVATE KEY-----";s:20:"private_key_password";s:32:".{32}";(s:9:"server_ip";s:\d+:"[0-9a-fA-F\.:]*";)?}/s';
@@ -69,37 +65,43 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     /**
      * Config writer interface
      */
-    private $configWriter = null;
+    protected $configWriter = null;
 
     /**
      * Cache type list (cleaned during update)
      */
-    private $cacheTypeList = null;
+    protected $cacheTypeList = null;
 
     /**
      * Config reader interface
      */
-    public $scopeConfig = null;
+    protected $scopeConfig = null;
 
     /**
      * XPC config data factory
      */
-    private $configFactory = null;
+    protected $configFactory = null;
 
     /**
      * Tab names
      */
-    private $tabs = array(
+    protected $tabs = array(
         self::TAB_WELCOME         => 'Welcome',
-        self::TAB_CONNECTION      => 'Connection settings',
+        self::TAB_CONNECTION      => 'Connection',
         self::TAB_PAYMENT_METHODS => 'Payment methods',
-        self::TAB_ZERO_AUTH       => 'Save credit card setup',
+        self::TAB_ZERO_AUTH       => 'Saving payment cards',
     );
+
+    /**
+     * Translated tabs
+     */
+    private static $translatedTabs = null;
 
     /**
      * List of supported API versions
      */
-    private $apiVersions = array(
+    protected $apiVersions = array(
+        '1.9',
         '1.7',
         '1.6',
     );
@@ -138,7 +140,7 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     /**
      * Map of fields stored in the bundle
      */
-    private $bundleMap = array(
+    protected $bundleMap = array(
         'store_id',
         'url',
         'public_key',
@@ -147,45 +149,55 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     );
 
     /**
+     * Core registry
+     */
+    protected $coreRegistry = null;
+
+    /**
      * Constructor
      *
-     * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
      * @param \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList
      * @param \CDev\XPaymentsConnector\Model\ConfigDataFactory $configFactory
+     * @param \Magento\Framework\Registry $coreRegistry
      *
      * @return void
      */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-        \CDev\XPaymentsConnector\Model\ConfigDataFactory $configFactory
+        \CDev\XPaymentsConnector\Model\ConfigDataFactory $configFactory,
+        \Magento\Framework\Registry $coreRegistry
     ) {
-        parent::__construct($context);
-
         $this->scopeConfig = $scopeConfig;
         $this->configWriter = $configWriter;
         $this->cacheTypeList = $cacheTypeList;
 
         $this->configFactory = $configFactory;
 
-        // Translate tabs
-        foreach ($this->tabs as $tab => $tabName) {
-            $this->tabs[$tab] = __($tabName);
-        }
+        $this->coreRegistry = $coreRegistry;
     }
 
     /**
-     * Get tabs
+     * Get tabs (translated)
      *
      * @return array
      */
     public function getTabs()
     {
-        return $this->tabs;
+        if (null === static::$translatedTabs) {
+
+            static::$translatedTabs = array();
+
+            // Translate tabs
+            foreach ($this->tabs as $tab => $tabName) {
+                static::$translatedTabs[$tab] = __($tabName);
+            }
+        }
+
+        return static::$translatedTabs;
     }
 
     /**
@@ -206,20 +218,6 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     }
 
     /**
-     * Flush magento config and page cache
-     *
-     * @return void
-     */
-    public function flushCache()
-    {
-        $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
-
-        $this->cacheTypeList->cleanType(\Magento\PageCache\Model\Cache\Type::TYPE_IDENTIFIER);
-
-        $this->helper->logDebug('Flush cache');
-    }
-
-    /**
      * Set config option value common for all payment methods
      *
      * @param string $name Option name
@@ -234,7 +232,11 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
             ->loadByName($name);
 
         if (empty($config->getName())) {
+
+            $storeId = (int)$this->coreRegistry->registry(RegistryConstants::CURRENT_STORE_ID);
+
             $config->setName($name);
+            $config->setStoreId($storeId);
         }
 
         $config->setValue($value)->save();
@@ -246,56 +248,54 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     }
 
     /**
-     * Mark payment method as active
+     * Get core config option value
      *
-     * @param bool $isActive
+     * @param string $path Option path in config
      *
-     * @return void
+     * @return string (or whatever is there)
      */
-    public function markMethodActive($isActive)
+    protected function readCoreConfig($path)
     {
-        $this->configWriter->save('payment/xpc/active', $isActive);
+        $storeId = (int)$this->coreRegistry->registry(RegistryConstants::CURRENT_STORE_ID);
 
-        $this->flushCache();
+        if (0 !== $storeId) {
+
+            $value = $this->scopeConfig->getValue($path, 'stores', $storeId);
+
+        } else {
+
+            $value = $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+
+        return $value;
     }
 
     /**
-     * Validate slot index of the XPC payment method
+     * Set core config option value
      *
-     * @param int  $xpcSlot Slot index of the XPC payment method
-     * @param bool $throwException Throw exception or not
+     * @param string $path Option path in config
+     * @param string $value Option value
      *
-     * @throws Exception
-     *
-     * @return int
+     * @return void
      */
-    public function checkXpcSlot($xpcSlot, $throwException = true)
+    protected function writeCoreConfig($path, $value)
     {
-        if (
-            !is_numeric($xpcSlot)
-            || $xpcSlot < 1
-            || $xpcSlot > self::MAX_SLOTS
-        ) {
+        $storeId = (int)$this->coreRegistry->registry(RegistryConstants::CURRENT_STORE_ID);
 
-            $xpcSlot = var_export($xpcSlot, true);
+        if (0 !== $storeId) {
 
-            $this->writeLog('Access to the invalid X-Payments method. Slot: ' . $xpcSlot, '', true);
+            $this->configWriter->save($path, $value, 'stores', $storeId);
 
-            if ($throwException) {
-                throw new \Exception('Access to the invalid X-Payments method. Slot: ' . $xpcSlot);
-            } else {
-                $xpcSlot = 0;
-            }
+        } else {
+
+            $this->configWriter->save($path, $value);
         }
-
-        return $xpcSlot;
     }
 
     /**
      * Get config option value for specific payment method
      *
-     * @param string $name    Option name
-     * @param int    $xpcSlot Slot index of the XPC payment method
+     * @param string $name Option name
      *
      * @return string (or whatever is there)
      */
@@ -303,15 +303,14 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     {
         $path = self::XPATH_PAYMENT . $name;
 
-        return $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->readCoreConfig($path);
     }
 
     /**
      * Set config option value for specific payment method
      *
-     * @param string $name    Option name
-     * @param string $value   Option value
-     * @param int    $xpcSlot Slot index of the XPC payment method
+     * @param string $name Option name
+     * @param string $value Option value
      *
      * @return void
      */
@@ -319,21 +318,21 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     {
         $path = self::XPATH_PAYMENT . $name;
 
-        $this->configWriter->save($path, $value);
+        $this->writeCoreConfig($path, $value);
     }
 
     /**
-     * Get config option value for saved cards payment method
+     * Get config option value for saved payment cards payment method
      *
      * @param string $name Option name
      *
      * @return string (or whatever is there)
      */
-    public function getSavedCardsConfig($name)
+    public function getPaymentCardConfig($name)
     {
-        $path = self::XPATH_SAVED_CARDS . $name;
+        $path = self::XPATH_PAYMENT_CARD . $name;
 
-        return $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->readCoreConfig($path);
     }
 
     /**
@@ -344,11 +343,11 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
      *
      * @return void
      */
-    public function setSavedCardsConfig($name, $value)
+    public function setPaymentCardConfig($name, $value)
     {
-        $path = self::XPATH_SAVED_CARDS . $name;
+        $path = self::XPATH_PAYMENT_CARD . $name;
 
-        $this->configWriter->save($path, $value);
+        $this->writeCoreConfig($path, $value);
     }
 
     /**
@@ -361,7 +360,7 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
      */
     public function decodeBundle($bundle = null)
     {
-        if (is_null($bundle)) {
+        if (null === $bundle) {
             $bundle = $this->getXpcConfig('xpay_conf_bundle');
         }
 
@@ -415,11 +414,6 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
         foreach ($this->bundleMap as $name) {
             $value = !empty($decoded[$name]) ? $decoded[$name] : '';
             $this->setXpcConfig($name, $value);
-        }
-
-        if (!empty($decoded['server_ip'])) {
-            // Do not erase IP address if it was not passed
-            $this->setXpcConfig('server_ip', $decoded['server_ip']);
         }
     }
 
@@ -662,45 +656,6 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     }
 
     /**
-     * Get payment configuration ID by slot index of the XPC payment method
-     *
-     * @param int $xpcSlot Slot index of the XPC payment method
-     *
-     * @return int
-     */
-    public function getConfidByXpcSlot($xpcSlot)
-    {
-        $xpcSlot = $this->checkXpcSlot($xpcSlot);
-
-        return $this->getPaymentConfig('confid', $xpcSlot);
-    }
-
-    /**
-     * Get slot index of the XPC payment method by payment configuration ID
-     *
-     * @param int $confid Payment configuration ID
-     *
-     * @return int
-     */
-    public function getXpcSlotByConfid($confid)
-    {
-        $found = false;
-
-        for ($xpcSlot = 1; $xpcSlot <= self::MAX_SLOTS; $xpcSlot++) {
-            if ($this->getPaymentConfig('confid', $xpcSlot) == $confid) {
-                $found = true;
-                break;
-            }
-        }
-
-        if (!$found) {
-            throw new \Exception('Payment configuration is not configured. ID: ' . $confid);
-        }
-
-        return $xpcSlot;
-    }
-
-    /**
      * Get redirect form URL
      *
      * @return string
@@ -737,5 +692,20 @@ class Settings extends \CDev\XPaymentsConnector\Helper\AbstractHelper
         $url = rtrim($url, '/') . '/api.php';
 
         return $url;
+    }
+
+    /**
+     * Flush magento config and page cache
+     *
+     * @return void
+     */
+    public function flushCache()
+    {
+        $this->cacheTypeList->cleanType(\Magento\Framework\App\Cache\Type\Config::TYPE_IDENTIFIER);
+
+        $this->cacheTypeList->cleanType(\Magento\PageCache\Model\Cache\Type::TYPE_IDENTIFIER);
+
+        // TODO: Consider remove logging
+        $this->helper->logDebug('Flush cache');
     }
 }

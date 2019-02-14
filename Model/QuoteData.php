@@ -28,15 +28,64 @@ namespace CDev\XPaymentsConnector\Model;
 class QuoteData extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
 {
     /**
-     * Token TTL
+     * Payment token TTL
      */
-    const TTL = 900;
+    const TOKEN_TTL = 900;
 
     /**
      * Cache tag
-     * TODO: is it necesary?
      */
     const CACHE_TAG = 'xpc_quote_data';
+
+    /**
+     * Cache tag
+     */
+    protected $_cacheTag = self::CACHE_TAG;
+
+    /**
+     * Event prefix
+     */
+    protected $_eventPrefix = 'xpc_quote_data';
+
+    /**
+     * Date
+     */
+    protected $date = null;
+
+    /**
+     * XPC Helper
+     */
+    protected $helper = null;
+
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $coreRegistry
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
+     * @param \CDev\XPaymentsConnector\Helper\Data $helper
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
+     * @param array $data
+     *
+     * @return void
+     */
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $coreRegistry,
+        \Magento\Framework\Stdlib\DateTime\DateTime $date,
+        \CDev\XPaymentsConnector\Helper\Data $helper,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = array()
+    ) {
+
+        parent::__construct($context, $coreRegistry, $resource, $resourceCollection, $data);
+
+        $this->date = $date;
+
+        $this->helper = $helper;
+    }
 
     /**
      * Constructor
@@ -49,21 +98,73 @@ class QuoteData extends \Magento\Framework\Model\AbstractModel implements \Magen
     }
 
     /**
-     * Load data by name
+     * Load data by Quote ID
      *
-     * @param string $name Name
+     * @param int $quoteId Quote ID
      *
      * @return \CDev\XPaymentsConnector\Model\QuoteData
      */
-    public function loadByConf($quoteId, $confId)
+    public function loadByQuoteId($quoteId)
     {
-        $id = $this->_getResource()->loadByConf($this, $quoteId, $confId);
+        $confId = $this->helper->settings->getXpcConfig('active_confid');
+
+        $id = $this->_getResource()->loadByQuoteAndConf($quoteId, $confId);
         
         $this->load($id);
 
-        // TODO: Add expiration check
+        return $this;
+    }
+
+    /**
+     * Load data by Quote
+     *
+     * @param \Magento\Quote\Model\Quote $quote Quote
+     *
+     * @return \CDev\XPaymentsConnector\Model\QuoteData
+     */
+    public function loadByQuote(\Magento\Quote\Model\Quote $quote)
+    {
+        return $this->loadByQuoteId($quote->getId());
+    }
+
+    /**
+     * Set payment session expiration
+     *
+     * @return $this
+     */
+    public function setExpiration()
+    {
+        $expires = (int)$this->date->gmtDate('U') + self::TOKEN_TTL;
+
+        $this->setExpires($expires);
 
         return $this;
+    }
+
+    /**
+     * Check if payment session is expired
+     *
+     * @return bool
+     */
+    public function isExpired()
+    {
+        $currentTime = (int)$this->date->gmtDate('U');
+
+        $expireTime = (int)$this->date->gmtDate('U', $this->getExpires());
+
+        return $expireTime <= $currentTime;
+    }
+
+    /**
+     * Check if XPC data is valid: token, txnId, expiration
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        return !empty($this->getToken())
+            && !empty($this->getTxnid())
+            && !$this->isExpired();
     }
 
     /**

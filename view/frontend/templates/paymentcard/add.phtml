@@ -1,0 +1,52 @@
+<?php
+// vim: set ts=2 sw=2 sts=2 et:
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * @author     Qualiteam Software <info@x-cart.com>
+ * @category   CDev
+ * @package    CDev_XPaymentsConnector
+ * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+?>
+<?php
+/**
+ * @see CDev\XPaymentsConnector\Block\PaymentCard\Add
+ */
+?>
+
+<div class="add-new-card-container">
+
+  <iframe class="xpc-iframe" id="xpc-iframe" src="<?php echo $block->getIframeUrl(); ?>"></iframe>
+
+  <div class="xpc-address">
+    <address>
+      <strong><?php echo __('Billing Address'); ?></strong>
+      <br/>
+      <?php echo $block->getAddressHtml(); ?>
+    </address>
+  </div>
+
+</div>
+
+<div class="clearfix"></div>
+
+<div class="buttons">
+
+  <button class="action action-default primary" onclick="javascript: submitPaymentForm();">
+    <?php echo __('Save Payment Card'); ?>
+  </button>
+
+  <a href="<?php echo $block->getBackLink(); ?>"><?php echo __('Back to Payment Cards'); ?></a>
+</div>

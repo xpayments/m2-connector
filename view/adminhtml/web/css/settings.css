@@ -133,47 +133,14 @@ h3.connect-caption {
 /**
  * Payment methods
  */
-#payment-methods-form label {
-    cursor: pointer;
-    display: inline-block;
-    width: 100%;
-}
-
-#payment-methods-form tr.disabled {
-    background-color: #ececec;
-}
-
-#payment-methods-form tr.disabled label {
-    color: #555;
-}
-
-tr.specificcountry.hidden {
-    display: none;
-}
-
-button.gray,
-button.gray:hover {
-    border-color: #ccc #aaa #aaa #ccc;
-    background-color: #fff;
-    /* TODO: correct or remove */
-    background-image: url(../../skin/adminhtml/default/default/images/btn_back_bg.gif);
-    color: #555;
-}
-
-td.active,
-td.save-cards,
-th.save-cards,
-td.currency,
-th.currency {
+.payment-conf-active,
+.payment-conf-currency,
+.payment-conf-save-cards {
     text-align: center;
 }
 
-td.actions {
-    padding: 15px !important;
-}
-
-td.actions button {
-    margin-right: 15px;
+.admin__field-control select {
+    width: 100%;
 }
 
 /**
@@ -183,4 +150,31 @@ td.actions button {
     text-decoration: underline;
     border-bottom: none;
     color: #2f2f2f;
+}
+
+#xpc_settings_container .admin__field-control {
+    line-height: 3.2rem;
+}
+
+/**
+ * Action buttons
+ */
+button.xpc-button:after,
+button.xpc-button:before {
+    font-family: 'Admin Icons';
+    margin-left: .5em;
+    margin-right: .5em;
+    position: relative;
+    top: 1px;
+}
+
+button.xpc-button.add:after {
+    content: '\e644';
+    font-size: 0.5em;
+    margin-left: 0;
+    vertical-align: super;
+}
+
+button.xpc-button.import:before {
+    content: '\e621';
 }

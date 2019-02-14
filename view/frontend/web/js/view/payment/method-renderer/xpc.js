@@ -158,16 +158,16 @@ define(
                 this.reloadIframe();
             },
 
-        /**
-         * Returns state of place order button
-         *
-         * @returns {Boolean}
-         */
-        isButtonActive: function ()
-        {
-            return this.isActive() 
-                && this.isPlaceOrderActionAllowed();
-        },
+            /**
+             * Returns state of place order button
+             *
+             * @returns {Boolean}
+             */
+            isButtonActive: function ()
+            {
+                return this.isActive() 
+                    && this.isPlaceOrderActionAllowed();
+            },
 
             /**
              * Get payment method code
@@ -287,9 +287,7 @@ define(
 
                     // Error at X-Payments
 
-                    this.submitted = false;
-
-                    fullScreenLoader.stopLoader();
+                    this.processError(displayMessage);
 
                     var type = parseInt(msg.params.type);
 
@@ -302,11 +300,6 @@ define(
                         // TODO: implement
                         this.reloadIframe(true);
                     }
-
-                    // Top message
-                    globalMessageList.addErrorMessage({
-                        message: displayMessage
-                    });
 
                     return;
                 }
@@ -360,6 +353,11 @@ define(
                 this.getIframe().get(0).contentWindow.postMessage(message, '*');
             },
 
+            /**
+             * Save checkout data
+             *
+             * @return jqXHR
+             */
             saveCheckoutData: function ()
             {
                 var data = {
@@ -373,12 +371,33 @@ define(
 
                 data = {'data': JSON.stringify(data)};
 
-                console.log(data);
+                this.debug(data);
 
                 return jQuery.post(
                     window.checkoutConfig.payment.xpc.url.saveCheckoutData,
                     data
                 )
+            },
+
+            /**
+             * Process error
+             *
+             * @return void
+             */
+            processError: function (error)
+            {
+                fullScreenLoader.stopLoader();
+
+                this.submitted = false;
+
+                globalMessageList.addErrorMessage({
+                    message: error
+                });
+
+                // Scroll to top message
+                jQuery('html, body').animate({
+                    scrollTop: jQuery('.opc-progress-bar').offset().top
+                }, 200);
             },
 
             /**
@@ -397,9 +416,21 @@ define(
                 var self = this;
 
                 if (!this.submitted) {
+
+                    fullScreenLoader.startLoader();
+
                     this.saveCheckoutData().done(
+                        function (data) {
+
+                            if (data.error) {
+                                self.processError(data.error);
+                            } else {
+                                self.sendSubmitMessage();
+                            }
+                        }
+                    ).fail(
                         function () {
-                            self.sendSubmitMessage();
+                            self.processError('Error in saving checkout data');
                         }
                     );
                     return false;

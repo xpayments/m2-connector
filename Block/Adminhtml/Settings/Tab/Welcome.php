@@ -90,30 +90,6 @@ class Welcome extends \CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab
     }
 
     /**
-     * Get URL for the connection tab/page
-     *
-     * @return string
-     */
-    public function getConnectionTabUrl()
-    {
-        if ($this->getIsSystemConfig()) {
-
-            $tab = $this->helper->settings->isConfigured()
-                ? \CDev\XPaymentsConnector\Helper\Settings::TAB_PAYMENT_METHODS
-                : \CDev\XPaymentsConnector\Helper\Settings::TAB_CONNECTION;
-
-            $url = $this->getUrl('xpc/settings/index', array('active_tab' => $tab));
-
-        } else {
-
-            $url = 'javascript: goToTab("' . \CDev\XPaymentsConnector\Helper\Settings::TAB_CONNECTION . '");';
-        }
-
-        // TODO use native escaper
-        return htmlspecialchars($url);
-    }
-
-    /**
      * Get video link
      *
      * @return string

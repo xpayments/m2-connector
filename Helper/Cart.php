@@ -22,6 +22,8 @@
 
 namespace CDev\XPaymentsConnector\Helper;
 
+use Magento\Store\Model\ScopeInterface;
+
 /**
  * Helper for cart
  */
@@ -48,19 +50,36 @@ class Cart extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     private $storeManager = null;
 
     /**
+     * Scope config
+     */
+    protected $scopeConfig = null;
+
+    /**
+     * Customer repository
+     */
+    protected $customerRepository = null;
+
+    /**
      * Constructor
      *
      * @param \Magento\Store\Model\Information $storeInfo
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      *
      * @return void
      */
     public function __construct(
         \Magento\Store\Model\Information $storeInfo,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->storeInfo = $storeInfo;
         $this->storeManager = $storeManager;
+        $this->scopeConfig = $scopeConfig;
+
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -81,7 +100,7 @@ class Cart extends \CDev\XPaymentsConnector\Helper\AbstractHelper
                 'sku'      => $item->getData('sku'),
                 'name'     => $item->getData('name'),
                 'price'    => $this->preparePrice($item->getPrice()),
-                'quantity' => intval($item->getQty()),
+                'quantity' => (int)$item->getQty(),
             );
 
         }
@@ -139,12 +158,54 @@ class Cart extends \CDev\XPaymentsConnector\Helper\AbstractHelper
             'discount'             => 0.00,
             'totalCost'            => 0.00,
             'description'          => $description,
-            'merchantEmail'        => 'TODO@example.com',
+            'merchantEmail'        => $this->scopeConfig->getValue('trans_email/ident_support/email', ScopeInterface::SCOPE_STORE),
             'forceTransactionType' => $this->getForcedTransactionType($quote),
         );
 
         $this->prepareItems();
 
         return $this->result;
+    }
+
+    /**
+     * Prepare cart for initial payment request
+     *
+     * @param Mage_Customer_Model_Customer $customer Customer
+     *
+     * @return array
+     */
+    public function prepareFakeCart($customerId)
+    {
+        $description = $this->helper->settings->getXpcConfig('zero_auth_description');
+
+        $price = $this->preparePrice($this->helper->settings->getXpcConfig('zero_auth_amount'));
+
+        $currency = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
+
+        $customer = $this->customerRepository->getById($customerId);
+
+        $result = array(
+            'login'                => $customer->getEmail() . ' (User ID #' . $customer->getId() . ')',
+            'billingAddress'       => $this->helper->address->prepareCustomerBillingAddress($customer),
+            'shippingAddress'      => $this->helper->address->prepareCustomerShippingAddress($customer),
+            'items'                => array(
+                array(
+                    'sku'      => 'CardSetup',
+                    'name'     => 'CardSetup',
+                    'price'    => $price,
+                    'quantity' => '1',
+                ),
+            ),
+            'currency'             => $currency,
+            'shippingCost'         => 0.00,
+            'taxCost'              => 0.00,
+            'discount'             => 0.00,
+            'totalCost'            => $price,
+            'description'          => $description,
+            'merchantEmail'        => $this->scopeConfig->getValue('trans_email/ident_support/email', ScopeInterface::SCOPE_STORE),
+            'forceTransactionType' => 'A',
+        );
+
+        return $result;
     }
 }

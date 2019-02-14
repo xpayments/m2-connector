@@ -1,0 +1,4 @@
+card_type,"Credit Card Type"
+card_number,"Credit Card Number"
+xpc_txnid,"X-Payments Reference"
+xpc_message,"Message"

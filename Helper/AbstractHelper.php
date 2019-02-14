@@ -33,18 +33,6 @@ abstract class AbstractHelper extends \Magento\Framework\DataObject
     protected $helper = null;
 
     /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        // Just a wrapper. Most possibly will used later.
-
-        parent::__construct();
-    }
-
-    /**
      * Set helper with helpers
      *
      * @param CDev\XPaymentsConnector\Helper\Data

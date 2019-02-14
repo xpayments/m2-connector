@@ -28,6 +28,13 @@
         <script src="CDev_XPaymentsConnector::js/settings.js" />
     </head>
     <body>
+        <referenceContainer name="page.main.actions">
+            <block class="Magento\Backend\Block\Store\Switcher" name="store_switcher">
+                <action method="setUseConfirm">
+                    <argument name="params" xsi:type="string">1</argument>
+                </action>
+            </block>
+        </referenceContainer>
         <referenceContainer name="left">
             <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tabs" name="xpc_settings_tabs">
                 <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\Welcome" name="xpc_settings_tab_welcome" />
@@ -40,12 +47,72 @@
                     <argument name="name" xsi:type="string">connection</argument>
                     <argument name="block" xsi:type="string">xpc_settings_tab_connection</argument>
                 </action>
-                <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\PaymentMethods" name="xpc_settings_tab_payment_methods" />
+                <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\PaymentMethods" name="xpc_settings_tab_payment_methods">
+                    <uiComponent name="xpc_payment_configuration_listing" />
+                    <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Field\Input" name="xpc_settings_payment_method_title">
+                        <action method="setFieldParams">
+                            <argument name="title" xsi:type="string">Title</argument>
+                            <argument name="name" xsi:type="string">title</argument>
+                            <argument name="key" xsi:type="string">title</argument>
+                        </action>
+                    </block>
+                    <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Field\Select" name="xpc_settings_payment_method_enabled">
+                        <action method="setFieldParams">
+                            <argument name="title" xsi:type="string">Enabled</argument>
+                            <argument name="name" xsi:type="string">active</argument>
+                            <argument name="key" xsi:type="string">active</argument>
+                        </action>
+                        <action method="setYesNoOptions" />
+                    </block>
+                    <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Field\Select" name="xpc_settings_payment_method_init_action">
+                        <action method="setFieldParams">
+                            <argument name="title" xsi:type="string">Payment Action</argument>
+                            <argument name="name" xsi:type="string">payment_action</argument>
+                            <argument name="key" xsi:type="string">payment_action</argument>
+                        </action>
+                        <action method="setPaymentActionOptions" />
+                    </block>
+                    <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Field\Select" name="xpc_settings_payment_method_allow_specific">
+                        <action method="setFieldParams">
+                            <argument name="title" xsi:type="string">Payment from Applicable Countries</argument>
+                            <argument name="name" xsi:type="string">allowspecific</argument>
+                            <argument name="key" xsi:type="string">allowspecific</argument>
+                        </action>
+                        <action method="setAllowSpecificOptions" />
+                    </block>
+                    <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Field\Select" name="xpc_settings_payment_method_specific_country">
+                        <action method="setFieldParams">
+                            <argument name="title" xsi:type="string">Payment from Specific Countries</argument>
+                            <argument name="name" xsi:type="string">specificcountry</argument>
+                        </action>
+                        <action method="setSpecificCountryOptions" />
+                    </block>
+                </block>
                 <action method="addTab">
                     <argument name="name" xsi:type="string">payment_methods</argument>
                     <argument name="block" xsi:type="string">xpc_settings_tab_payment_methods</argument>
                 </action>
-                <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\ZeroAuth" name="xpc_settings_tab_zero_auth" />
+                <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab\ZeroAuth" name="xpc_settings_tab_zero_auth">
+                    <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Field\Select" name="xpc_settings_zero_auth_enabled">
+                        <action method="setFieldParams">
+                            <argument name="title" xsi:type="string">Enabled</argument>
+                        </action>
+                        <action method="setZeroAuthEnabledParams" />
+                        <action method="setYesNoOptions" />
+                    </block>
+                    <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Field\Input" name="xpc_settings_zero_auth_amount">
+                        <action method="setFieldParams">
+                            <argument name="title" xsi:type="string">Card authorization amount</argument>
+                        </action>
+                        <action method="setZeroAuthAmountParams" />
+                    </block>
+                    <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Field\Input" name="xpc_settings_zero_auth_description">
+                        <action method="setFieldParams">
+                            <argument name="title" xsi:type="string">Name card saving transaction</argument>
+                        </action>
+                        <action method="setZeroAuthDescriptionParams" />
+                    </block>
+                </block>
                 <action method="addTab">
                     <argument name="name" xsi:type="string">zero_auth</argument>
                     <argument name="block" xsi:type="string">xpc_settings_tab_zero_auth</argument>
@@ -54,7 +121,7 @@
             <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Help" name="xpc_settings_help" />
         </referenceContainer>
         <referenceContainer name="content">
-            <block class="Magento\Backend\Block\Template" template="CDev_XPaymentsConnector::settings.phtml" />
+            <block class="CDev\XPaymentsConnector\Block\Adminhtml\Settings\Container" />
         </referenceContainer>
         <referenceBlock name="head.components">
             <block class="Magento\Framework\View\Element\Js\Components" name="sales_page_head_components" template="Magento_Sales::page/js/components.phtml"/>

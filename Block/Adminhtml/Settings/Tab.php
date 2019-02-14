@@ -22,32 +22,27 @@
 
 namespace CDev\XPaymentsConnector\Block\Adminhtml\Settings;
 
+use CDev\XPaymentsConnector\Controller\RegistryConstants;
+
 /**
  * Abstract class for tab on the settings page
  */
 abstract class Tab extends \Magento\Backend\Block\Template implements \Magento\Backend\Block\Widget\Tab\TabInterface
 {
     /**
-     * Block template
-     */
-    protected $_template = '';
-
-    /**
      * Current tab
      */
     protected $tab = null;
 
     /**
-     * Helper
+     * XPC Helper
      */
     protected $helper = null;
 
     /**
-     * Core registry
-     *
-     * @var \Magento\Framework\Registry
+     * Core coreRegistry
      */
-    protected $_coreRegistry = null;
+    protected $coreRegistry = null;
 
     /**
      * Message manager interface
@@ -137,37 +132,32 @@ abstract class Tab extends \Magento\Backend\Block\Template implements \Magento\B
      */
     public function isCanSaveCards()
     {
-        // TODO: implement
-        return false;
+        return $this->helper->settings->isConfigured()
+            && $this->helper->settings->getXpcConfig('can_save_cards');
     }
 
     /**
      * Constructor
      *
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param array $data
-     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
-     * @param \CDev\XPaymentsConnector\Model\PaymentConfigurationFactory $pcFactory
      * @param \CDev\XPaymentsConnector\Helper\Data $helper
+     * @param array $data
      *
      * @return void
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        array $data = array(),
-        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Registry $coreRegistry,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        \CDev\XPaymentsConnector\Model\PaymentConfigurationFactory $pcFactory,
-        \CDev\XPaymentsConnector\Helper\Data $helper
+        \CDev\XPaymentsConnector\Helper\Data $helper,
+        array $data = array()
     ) {
 
-        $this->_template = 'settings/tab/' . $this->tab . '.phtml';
-        $this->_coreRegistry = $registry;
+        $this->coreRegistry = $coreRegistry;
 
         parent::__construct($context, $data);
-
-        $this->pcFactory = $pcFactory;
 
         $this->messageManager = $messageManager;
 
@@ -175,95 +165,22 @@ abstract class Tab extends \Magento\Backend\Block\Template implements \Magento\B
     }
 
     /**
-     * Get attributes string
-     * param1="value1" param2="value2"...
+     * Constructor
      *
-     * @param array $data Attributes list
-     *
-     * @return string
+     * @return void
      */
-    private function getAttributesStr($data)
+    protected function _construct()
     {
-        $str = '';
-
-        foreach ($data as $k => $v) {
-            $str .= $k . '=' . '"' . $this->escapeHtmlAttr($v) . '" ';
-        }
-
-        return $str;
+        $this->_template = 'settings/tab/' . $this->tab . '.phtml';
     }
 
     /**
-     * Get HTML code for selectbox
+     * Get current Store ID
      *
-     * @param array $data Selectbox data
-     *
-     * @return string
+     * @return int
      */
-    public function getSelectboxHtml($data)
+    public function getCurrentStoreId()
     {
-        $str = '<select '
-            . $this->getAttributesStr($data['select'])
-            . '>' . PHP_EOL;
-
-        foreach ($data['options'] as $option) {
-            $title = $option['title'];
-            unset($option['title']);
-            $str .= '<option ' . $this->getAttributesStr($option) . '>'
-                . __($title)
-                . '</option>' . PHP_EOL;
-        }
-
-        $str .= '</select>';
-
-        return $str;
-    }
-
-    /**
-     * Get HTML code for checkbox
-     *
-     * @param array $data Checkbox data
-     *
-     * @return string
-     */
-    public function getCheckboxHtml($data)
-    {
-        $str = '<input type="checkbox" '
-            . $this->getAttributesStr($data)
-            . '/>';
-
-        return $str;
-    }
-
-    /**
-     * Get HTML code for radio
-     *
-     * @param array $data Checkbox data
-     *
-     * @return string
-     */
-    public function getRadioHtml($data)
-    {
-        $str = '<input type="radio" '
-            . $this->getAttributesStr($data)
-            . '/>';
-
-        return $str;
-    }
-
-    /**
-     * Get HTML code for input
-     *
-     * @param array $data Input data
-     *
-     * @return string
-     */
-    public function getInputHtml($data)
-    {
-        $str = '<input type="text" class="input-text" '
-            . $this->getAttributesStr($data)
-            . '/>';
-
-        return $str;
+        return (int)$this->coreRegistry->registry(RegistryConstants::CURRENT_STORE_ID);
     }
 }

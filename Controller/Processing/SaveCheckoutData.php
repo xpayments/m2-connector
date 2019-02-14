@@ -28,63 +28,147 @@ namespace CDev\XPaymentsConnector\Controller\Processing;
 class SaveCheckoutData extends \Magento\Framework\App\Action\Action
 {
     /**
-     * Result page factory
+     * Data hash
      */
-    protected $resultPageFactory;
+    protected $data = array();
 
     /**
-     * Controller result factory
+     * Billing data hash
+     */
+    protected $billingData = array();
+
+    /**
+     * Quote model
+     */
+    protected $quote = null;
+
+    /**
+     * Result factory
      */
     protected $resultFactory = null;
 
     /**
-     * Quote factory
+     * XPC Helper
      */
-    private $quoteFactory = null;
+    protected $helper = null;
 
     /**
-     * Helper
+     * Checkout session
      */
-    private $helper = null;
-
-    /**
-     * Quote
-     */
-    private $quote = null;
+    protected $checkoutSession = null;
 
     /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Framework\Controller\ResultFactory $resultFactory
-     * @param \Magento\Checkout\Model\Session $session
-     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Checkout\Model\Session\Proxy $checkoutSession
      * @param \CDev\XPaymentsConnector\Helper\Data $helper
-     * @param \CDev\XPaymentsConnector\Model\QuoteDataFactory $quoteFactory
      *
      * @return void
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Framework\Controller\ResultFactory $resultFactory,
-        \Magento\Checkout\Model\Session $session,
-        \Magento\Customer\Model\Session $customerSession,
-        \CDev\XPaymentsConnector\Helper\Data $helper,
-        \CDev\XPaymentsConnector\Model\QuoteDataFactory $quoteFactory
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
+        \CDev\XPaymentsConnector\Helper\Data $helper
     ) {
-        $this->resultPageFactory = $resultPageFactory;
         $this->resultFactory = $resultFactory;
+        $this->checkoutSession = $checkoutSession;
 
         $this->helper = $helper;
 
-        $this->quote = $session->getQuote();
-        $this->session = $customerSession;
-
-        $this->quoteFactory = $quoteFactory;
-
         parent::__construct($context);
+    }
+
+    /**
+     * Parse POST-ed data
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     *
+     * @return $this
+     */
+    protected function prepareData()
+    {
+        $this->data = $this->getRequest()->getPostValue();
+
+        if (!empty($this->data['data'])) {
+            $this->data = json_decode($this->data['data'], true);
+        }
+
+        if (json_last_error()) {
+            throw new \Magento\Framework\Exception\LocalizedException('Error in parsing checkout data');
+        }
+
+        if (!empty($this->data['billingAddress'])) {
+            $this->billingData = $this->data['billingAddress'];
+            unset($this->data['billingAddress']);
+        }
+
+        $this->quote = $this->checkoutSession->getQuote();
+
+        return $this;
+    }
+
+    /**
+     * Process regular data
+     *
+     * @return $this
+     */
+    protected function processData()
+    {
+        if (!empty($this->data['email'])) {
+            $this->quote->getBillingAddress()->setEmail($this->data['email']);
+            $this->quote->getShippingAddress()->setEmail($this->data['email']);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Process billing data
+     *
+     * @return $this
+     */
+    protected function processBillingData()
+    {
+        if (!empty($this->billingData['country_id'])) {
+            $this->quote->getBillingAddress()->setCountryId($this->billingData['country_id']);
+        }
+
+        if (!empty($this->billingData['postcode'])) {
+            $this->quote->getBillingAddress()->setPostcode($this->billingData['postcode']);
+        }
+
+        if (!empty($this->billingData['region_id'])) {
+            $this->quote->getBillingAddress()->setRegionId($this->billingData['region_id']);
+        }
+
+        if (!empty($this->billingData['city'])) {
+            $this->quote->getBillingAddress()->setCity($this->billingData['city']);
+        }
+
+        if (!empty($this->billingData['street'])) {
+            $street = is_array($this->billingData['street'])
+                ? implode(PHP_EOL, array_filter($this->billingData['street']))
+                : $this->billingData['street'];
+
+            $this->quote->getBillingAddress()->setStreet($street);
+        }
+
+        if (!empty($this->billingData['telephone'])) {
+            $this->quote->getBillingAddress()->setTelephone($this->billingData['telephone']);
+        }
+
+        if (!empty($this->billingData['firstname'])) {
+            $this->quote->getBillingAddress()->setFirstName($this->billingData['firstname']);
+        }
+
+        if (!empty($this->billingData['lastname'])) {
+            $this->quote->getBillingAddress()->setLastName($this->billingData['lastname']);
+        }
+
+        return $this;
     }
 
     /**
@@ -94,57 +178,23 @@ class SaveCheckoutData extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $data = $this->getRequest()->getPostValue();
+        $result = array();
 
-        if (!empty($data['data'])) {
-            $data = json_decode($data['data'], true);
-        }
+        try {
 
-        if (!empty($data['billingAddress'])) {
-
-            $data = $data['billingAddress'];
-
-            if (!empty($data['country_id'])) {
-                $this->quote->getBillingAddress()->setCountryId($data['country_id']);
-            }
-
-            if (!empty($data['postcode'])) {
-                $this->quote->getBillingAddress()->setPostcode($data['postcode']);
-            }
-
-            if (!empty($data['region_id'])) {
-                $this->quote->getBillingAddress()->setRegionId($data['region_id']);
-            }
-
-            if (!empty($data['city'])) {
-                $this->quote->getBillingAddress()->setCity($data['city']);
-            }
-
-            if (!empty($data['street'])) {
-
-                $street = is_array($data['street']) ? implode(PHP_EOL, array_filter($data['street'])) : $data['street'];
-
-                $this->quote->getBillingAddress()->setStreet($street);
-            }
-
-            if (!empty($data['telephone'])) {
-                $this->quote->getBillingAddress()->setTelephone($data['telephone']);
-            }
-
-            if (!empty($data['firstname'])) {
-                $this->quote->getBillingAddress()->setFirstName($data['firstname']);
-            }
-
-            if (!empty($data['lastname'])) {
-                $this->quote->getBillingAddress()->setLastName($data['lastname']);
-            }
+            $this->prepareData()
+                ->processData()
+                ->processBillingData();
 
             $this->quote->save();
+
+        } catch (\Exception $exception) {
+
+            $result['error'] = $exception->getMessage();
         }
 
-        $resultRaw = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_RAW);
-        $resultRaw->setContents('');
-
-        return $resultRaw;
+        return $this->resultFactory
+            ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
+            ->setData($result);
     }
 }

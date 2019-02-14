@@ -25,7 +25,7 @@ namespace CDev\XPaymentsConnector\Controller\Adminhtml\Settings;
 /**
  * Update settings action
  */
-class Update extends AbstractAction
+class Update extends \CDev\XPaymentsConnector\Controller\Adminhtml\Settings
 {
     /**
      * Load the page defined in view/adminhtml/layout/xpc_settings_index.xml
@@ -34,25 +34,24 @@ class Update extends AbstractAction
      */
     public function execute()
     {
+        $this->initCurrentStoreId();
+
         $redirect = $this->redirectToTab($this->helper->settings::TAB_CONNECTION);
 
-        // Save IP address
-        $ip = (string)$this->getRequest()->getParam('server_ip');
-        $this->helper->settings->setXpcConfig('server_ip', $ip);
+        try {
 
-        // Save force HTTP option
-        $forceHttp = (bool)$this->getRequest()->getParam('force_http');
-        $this->helper->settings->setXpcConfig('force_http', $forceHttp);
+            // Force recheck configuration
+            $this->helper->settings->setRecheckFlag();
 
-        // Save title
-        $title = (string)$this->getRequest()->getParam('title');
-        $this->helper->settings->setPaymentConfig('title', $title);
+            if ($this->helper->settings->isConfigured()) {
 
-        // Save payment action
-        $paymentAction = (string)$this->getRequest()->getParam('payment_action');
-        $this->helper->settings->setPaymentConfig('payment_action', $paymentAction);
+                $this->addSuccessTopMessage('Configuration updated');
+            }
 
-        $this->helper->settings->flushCache();
+        } catch (\Exception $exception) {
+
+            $this->addErrorTopMessage($exception->getMessage());
+        }
 
         return $redirect;
     }

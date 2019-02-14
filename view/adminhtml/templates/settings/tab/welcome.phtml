@@ -72,7 +72,7 @@
   <div class="step">
     <span class="step-number">3</span>
     <p>
-      <a href="<?php /* @noEscape */ echo $block->getConnectionTabUrl(); ?>" id="connect-link" title="<?php echo $block->escapeHtmlAttr(__('Go to Connection settings tab')); ?>">
+      <a href="javascript: goToTab('connection');" id="connect-link" title="<?php echo $block->escapeHtmlAttr(__('Go to Connection settings tab')); ?>">
         <?php echo $block->escapeHtml(__('Connect')); ?>
         <strong><?php echo $block->escapeHtml(__('X-Payments')); ?></strong>
         <?php echo $block->escapeHtml(__('with')); ?>

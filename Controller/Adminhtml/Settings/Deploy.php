@@ -25,13 +25,32 @@ namespace CDev\XPaymentsConnector\Controller\Adminhtml\Settings;
 /**
  * Deploy configuration bundle controller action
  */
-class Deploy extends AbstractAction
+class Deploy extends \CDev\XPaymentsConnector\Controller\Adminhtml\Settings
 {
     /**
-     * Some error messages
+     * Check XPC bundle
+     *
+     * @throws \Magento\Framework\Magento\Framework\Exception
+     *
+     * @return string
      */
-    const ERROR_EMPTY_IMPORTED_METHODS = 'Payment methods import failed. Make sure you’ve activated your payment configurations and assigned them to this store in X-Payments dashboard.';
-    const ERROR_INVALID_BUNDLE = 'Invalid configuration bundle';
+    protected function getBundle()
+    {
+        $bundle = $this->getRequest()->getParam('bundle');
+        $bundle = (string)$bundle;
+
+        $decoded = $this->helper->settings->decodeBundle($bundle);
+
+        // Check submitted bundle
+        if (empty($decoded)) {
+
+            $this->helper->settings->setXpcConfig('is_configured', false, true);
+
+            throw new \Magento\Framework\Exception\LocalizedException(__('Invalid configuration bundle'));
+        }
+
+        return $bundle;
+    }
 
     /**
      * Load the page defined in view/adminhtml/layout/xpc_settings_index.xml
@@ -40,26 +59,16 @@ class Deploy extends AbstractAction
      */
     public function execute()
     {
+        $this->initCurrentStoreId();
+
         $redirect = $this->redirectToTab($this->helper->settings::TAB_CONNECTION);
 
         try {
 
-            // Save force HTTP option
-            $forceHttp = (bool)$this->getRequest()->getParam('force_http');
-            $this->helper->settings->setXpcConfig('force_http', $forceHttp);
-
             $this->helper->settings->cleanXpcBundle();
 
-            $bundle = $this->getRequest()->getParam('bundle');
-            $bundle = (string)$bundle;
-
-            $decoded = $this->helper->settings->decodeBundle($bundle);
-
             // Check submitted bundle
-            if (empty($decoded)) {
-                $this->helper->settings->setXpcConfig('is_configured', false, true);
-                throw new \Exception(self::ERROR_INVALID_BUNDLE);
-            }
+            $bundle = $this->getBundle();
 
             // Save bundle and reload config
             $this->helper->settings->setXpcBundle($bundle);
@@ -70,16 +79,16 @@ class Deploy extends AbstractAction
             if ($this->helper->settings->isConfigured()) {
 
                 $this->importPaymentMethods();
-                // TODO: implement
-                // $this->autoActivateZeroAuth();
+                $this->autoActivateZeroAuth();
+
                 $this->addSuccessTopMessage('Configuration bundle has been deployed successfully');
 
                 $redirect = $this->redirectToTab($this->helper->settings::TAB_PAYMENT_METHODS);
             }
 
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
 
-            $this->addErrorTopMessage($e->getMessage());
+            $this->addErrorTopMessage($exception->getMessage());
         }
 
         return $redirect;

@@ -36,19 +36,23 @@ class Handler extends \Magento\Framework\Logger\Handler\Base
      * Constructor
      *
      * @param \Magento\Framework\Filesystem\DriverInterface $filesystem
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
      * @param string $filePath
      * @param string $fileName
      *
      * @return void
+     *
+     * @SuppressWarnings(MEQP2.Classes.ConstructorOperations.CustomOperationsFound)
+     * @codingStandardsIgnoreStart
      */
     public function __construct(
         \Magento\Framework\Filesystem\DriverInterface $filesystem,
+        \Magento\Framework\Stdlib\DateTime\DateTime $date,
         $filePath = null,
         $fileName = null
     ) {
 
-        // TODO: Timezone once a month
-        $this->fileName = str_replace('XPC-DATE', date('Y-m'), $this->fileName);
+        $this->fileName = str_replace('XPC-DATE', $date->date('Y-m'), $this->fileName);
 
         parent::__construct($filesystem, $filePath, $fileName);
     }

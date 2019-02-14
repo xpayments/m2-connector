@@ -69,27 +69,10 @@ class Connection extends \CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab
                 )
         );
 
-        $this->setChild(
-            'updateButton',
-            $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')
-                ->setData(
-                    array(
-                        'type'  => 'submit',
-                        'label' => __('Update'),
-                        'class' => 'task'
-                    )
-                )
-        );
-
         if (!empty($this->getErrorList())) {
             foreach ($this->getErrorList() as $error) {
                 $this->messageManager->addError($error);
             }
-        } elseif (!$this->isWelcomeMode()) {
-            $this->messageManager->addSuccess(
-                __('Connection with X-Payments is OK. API version: ')
-                . $this->helper->settings->getXpcConfig('api_version')
-            );
         }
     }
 
@@ -122,36 +105,13 @@ class Connection extends \CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab
     }
 
     /**
-     * Get data for payment action selectbox
+     * Get update form action
      *
-     * @return array
+     * @return string
      */
-    public function getPaymentActionData()
+    public function getUpdateFormAction()
     {
-        $data = array(
-            'select' => array(
-                'name' => 'payment_action',
-                'class' => 'select admin__control-select',
-            ),
-            'options' => array(
-                'authorize' => array(
-                    'value' => 'authorize',
-                    'title' => 'Authorize',
-                ),
-                'authorize_capture' => array(
-                    'value' => 'authorize_capture',
-                    'title' => 'Authorize and capture',
-                ),
-            ),
-        );
-
-        $selected = ('authorize' == $this->getSettings()->getPaymentConfig('payment_action'))
-            ? 'authorize'
-            : 'authorize_capture';
-
-        $data['options'][$selected]['selected'] = 'selected';
-
-        return $data;
+        return $this->_urlBuilder->getUrl('xpc/settings/update');
     }
 
     /**
@@ -162,15 +122,5 @@ class Connection extends \CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab
     public function getDeployFormAction()
     {
         return $this->_urlBuilder->getUrl('xpc/settings/deploy');
-    }
-
-    /**
-     * Get update form action
-     *
-     * @return string
-     */
-    public function getUpdateFormAction()
-    {
-        return $this->_urlBuilder->getUrl('xpc/settings/update');
     }
 }

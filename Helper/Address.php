@@ -44,6 +44,32 @@ class Address extends \CDev\XPaymentsConnector\Helper\AbstractHelper
     const SHIPPING_ADDRESS = 'Shipping';
 
     /**
+     * Address Repository
+     */
+    protected $addressRepository = null;
+
+    /**
+     * Region factory
+     */
+    protected $regionFactory = null;
+
+    /**
+     * Constructor
+     *
+     * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
+     *
+     * @return void
+     */
+    public function __construct(
+        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
+        \Magento\Directory\Model\RegionFactory $regionFactory
+    ) {
+
+        $this->addressRepository = $addressRepository;
+        $this->regionFactory = $regionFactory;
+    }
+
+    /**
      * Prepare state
      *
      * @param array $data Address data
@@ -56,8 +82,7 @@ class Address extends \CDev\XPaymentsConnector\Helper\AbstractHelper
 
         if (!empty($data['region_id'])) {
 
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $region = $objectManager->create('Magento\Directory\Model\Region')->load($data['region_id']);
+            $region = $this->regionFactory->create()->load($data['region_id']);
 
             if (
                 $region
@@ -98,14 +123,15 @@ class Address extends \CDev\XPaymentsConnector\Helper\AbstractHelper
      * Prepare address for initial payment request (internal)
      *
      * @param \Magento\Quote\Model\Quote $quote Quote
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer Customer
      * @param $type Address type, Billing or Shipping
      *
      * @return array
      */
-    private function prepareAddress(\Magento\Quote\Model\Quote $quote = null, $type = self::BILLING_ADDRESS)
+    protected function prepareAddress(\Magento\Quote\Model\Quote $quote = null, \Magento\Customer\Api\Data\CustomerInterface $customer = null, $type = self::BILLING_ADDRESS)
     {
         $getAddress = 'get' . $type . 'Address';
-        $getDefaultAddress = 'getDefault' . $type . 'Address';
+        $getDefaultAddressId = 'getDefault' . $type;
 
         $customerAddress = $customerDefaultAddress = $quoteAddress = $orderAddress = array();
 
@@ -118,7 +144,17 @@ class Address extends \CDev\XPaymentsConnector\Helper\AbstractHelper
             }
         }
 
-        // TODO: implement customer's address
+        if ($customer) {
+
+            $addressId = $customer->$getDefaultAddressId();
+
+            if ($addressId) {
+
+                $customerDefaultAddress = $this->addressRepository->getById($addressId);
+
+                $customerDefaultAddress = $customerDefaultAddress->__toArray();
+            }
+        }
 
         $data = array_merge(
             array_filter($customerAddress),
@@ -153,7 +189,7 @@ class Address extends \CDev\XPaymentsConnector\Helper\AbstractHelper
      */
     public function prepareQuoteBillingAddress(\Magento\Quote\Model\Quote $quote)
     {
-        return $this->prepareAddress($quote, self::BILLING_ADDRESS);
+        return $this->prepareAddress($quote, null, self::BILLING_ADDRESS);
     }
 
     /**
@@ -165,6 +201,30 @@ class Address extends \CDev\XPaymentsConnector\Helper\AbstractHelper
      */
     public function prepareQuoteShippingAddress(\Magento\Quote\Model\Quote $quote)
     {
-        return $this->prepareAddress($quote, self::SHIPPING_ADDRESS);
+        return $this->prepareAddress($quote, null, self::SHIPPING_ADDRESS);
+    }
+
+    /**
+     * Prepare billing address from customer for initial payment request
+     *
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     *
+     * @return array
+     */
+    public function prepareCustomerBillingAddress(\Magento\Customer\Api\Data\CustomerInterface $customer)
+    {
+        return $this->prepareAddress(null, $customer, self::BILLING_ADDRESS);
+    }
+
+    /**
+     * Prepare shipping address from customer for initial payment request
+     *
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     *
+     * @return array
+     */
+    public function prepareCustomerShippingAddress(\Magento\Customer\Api\Data\CustomerInterface $customer)
+    {
+        return $this->prepareAddress(null, $customer, self::SHIPPING_ADDRESS);
     }
 }

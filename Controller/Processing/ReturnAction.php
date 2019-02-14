@@ -22,59 +22,67 @@
 
 namespace CDev\XPaymentsConnector\Controller\Processing;
 
+use CDev\XPaymentsConnector\Controller\RegistryConstants;
+
 /**
  * Return from payment form (in iframe)
  */
 class ReturnAction extends \Magento\Framework\App\Action\Action
 {
     /**
+     * Session models
+     */
+    protected $customerSession = null;
+    protected $checkoutSession = null;
+
+    /**
      * Result page factory
      */
-    protected $resultPageFactory;
+    protected $pageFactory = null;
 
     /**
-     * Controller result factory
+     * XPC Quote Data factory
      */
-    protected $resultFactory = null;
+    protected $quoteDataFactory = null;
 
     /**
-     * Helper
+     * XPC Helper
      */
-    private $helper = null;
+    protected $helper = null;
 
     /**
-     * Quote
+     * Core coreRegistry
      */
-    private $quote = null;
+    protected $coreRegistry = null;
 
     /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Framework\Controller\ResultFactory $resultFactory
-     * @param \Magento\Checkout\Model\Session $session
+     * @param \Magento\Framework\View\Result\PageFactory $pageFactory
+     * @param \Magento\Checkout\Model\Session\Proxy $checkoutSession
+     * @param \Magento\Customer\Model\Session\Proxy $customerSession
      * @param \CDev\XPaymentsConnector\Helper\Data $helper
-     * @param \CDev\XPaymentsConnector\Model\QuoteDataFactory $quoteFactory
+     * @param \CDev\XPaymentsConnector\Model\QuoteDataFactory $quoteDataFactory
      *
      * @return void
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Framework\Controller\ResultFactory $resultFactory,
-        \Magento\Checkout\Model\Session $session,
+        \Magento\Framework\View\Result\PageFactory $pageFactory,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
+        \Magento\Customer\Model\Session\Proxy $customerSession,
         \CDev\XPaymentsConnector\Helper\Data $helper,
-        \CDev\XPaymentsConnector\Model\QuoteDataFactory $quoteFactory
+        \CDev\XPaymentsConnector\Model\QuoteDataFactory $quoteDataFactory,
+        \Magento\Framework\Registry $coreRegistry
     ) {
-        $this->resultPageFactory = $resultPageFactory;
-        $this->resultFactory = $resultFactory;
-
+        $this->pageFactory = $pageFactory;
         $this->helper = $helper;
+        $this->customerSession = $customerSession;
+        $this->checkoutSession = $checkoutSession;
+        $this->quoteDataFactory = $quoteDataFactory;
 
-        $this->quote = $session->getQuote();
-
-        $this->quoteFactory = $quoteFactory;
+        $this->coreRegistry = $coreRegistry;
 
         parent::__construct($context);
     }
@@ -86,27 +94,15 @@ class ReturnAction extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $quoteData = $this->quoteFactory->create()->loadByConf(
-            $this->quote->getId(),
-            $this->helper->settings->getXpcConfig('active_confid')
-        );
+        $quote = $this->checkoutSession->getQuote();
 
-        $quoteData->setToken('')->save();
+        $this->coreRegistry->register(RegistryConstants::CURRENT_STORE_ID, $quote->getStoreId());
 
-        // TODO: create template
+        $quoteData = $this->quoteDataFactory->create()
+            ->loadByQuote($quote)
+            ->setToken('')
+            ->save();
 
-        $contents = '<script>'
-            . 'function postMessageToParent(msg) {'
-            . '  if (window.JSON) {'
-            . '    window.parent.postMessage(JSON.stringify(msg), \'*\');'
-            . '  }'
-            . '}'
-            . 'postMessageToParent({message: "return"});'
-            . '</script>';
-
-        $resultRaw = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_RAW);
-        $resultRaw->setContents($contents);
-
-        return $resultRaw;
+        return $this->pageFactory->create();
     }
 }

@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!--
+// vim: set ts=4 sw=4 sts=4 et:
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * @author     Qualiteam Software <info@x-cart.com>
+ * @category   CDev
+ * @package    CDev_XPaymentsConnector
+ * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">xpc_payment_configuration_listing.xpc_payment_configuration_listing_data_source</item>
+            <item name="deps" xsi:type="string">xpc_payment_configuration_listing.xpc_payment_configuration_listing_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">spinner_columns</item>
+    </argument>
+    <dataSource name="xpc_payment_configuration_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">CDev\XPaymentsConnector\Ui\PaymentConfiguration\DataProvider</argument>
+            <argument name="name" xsi:type="string">xpc_payment_configuration_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="update_url" xsi:type="url" path="xpc/payment_configuration/render/store_id/PLACEHOLDER/" />
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <!-- These features are not necessary now -->
+        <!--bookmark name="bookmarks"/-->
+        <!--columnsControls name="columns_controls"/-->
+        <!--filterSearch name="fulltext"/-->
+        <!--paging name="listing_paging"/-->
+        <!--filters name="listing_filters"/-->
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="sticky" xsi:type="boolean">false</item>
+            </item>
+        </argument>
+    </listingToolbar>
+    <columns name="spinner_columns">
+        <column name="is_active" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Active</item>
+                    <item name="fieldClass" xsi:type="string">payment-conf-active</item>
+                    <item name="bodyTmpl" xsi:type="string">CDev_XPaymentsConnector/grid/cells/payment_configuration/active</item>
+                </item>
+            </argument>
+        </column>
+        <column name="confid" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sorting" xsi:type="string">asc</item>
+                    <item name="label" xsi:type="string" translate="true">ID</item>
+                </item>
+            </argument>
+        </column>
+        <column name="name" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Name</item>
+                    <item name="bodyTmpl" xsi:type="string">CDev_XPaymentsConnector/grid/cells/payment_configuration/name</item>
+                </item>
+            </argument>
+        </column>
+        <column name="currency" sortOrder="40">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Currency</item>
+                    <item name="fieldClass" xsi:type="string">payment-conf-currency</item>
+                </item>
+            </argument>
+        </column>
+        <column name="save_cards" sortOrder="50">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Save Cards</item>
+                    <item name="fieldClass" xsi:type="string">payment-conf-save-cards</item>
+                    <item name="bodyTmpl" xsi:type="string">CDev_XPaymentsConnector/grid/cells/payment_configuration/save_cards</item>
+                </item>
+            </argument>
+        </column>
+    </columns>
+</listing>

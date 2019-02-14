@@ -26,6 +26,27 @@
  */
 ?>
 
-<?php
+<div class="fieldset-wrapper-title">
+  <strong class="title"><?php echo $block->escapeHtml(__('Payment Card setup')); ?></strong>
+</div>
 
-// TODO: implement
+<p class="admin__field-control">
+  <?php echo __('Configure saving their credit or debit cards by customers in their user profiles.'); ?>
+</p>
+
+<form action="<?php echo $block->escapeUrl($block->getUrl('xpc/settings/zeroauth')); ?>" method="post" name="update_form" id="zero-auth-form">
+  <?php echo $block->getBlockHtml('formkey'); ?>
+  <input type="hidden" name="store" value="<?php echo $block->getCurrentStoreId(); ?>" />
+  <input type="hidden" name="mode" value="update" id="zero-auth-form-mode" />
+
+  <div class="fieldset-wrapper">
+    <fieldset class="admin__fieldset">
+
+      <?php echo $block->getChildHtml('xpc_settings_zero_auth_enabled'); ?>
+      <?php echo $block->getChildHtml('xpc_settings_zero_auth_amount'); ?>
+      <?php echo $block->getChildHtml('xpc_settings_zero_auth_description'); ?>
+
+    </fieldset>
+  </div>
+
+</form>

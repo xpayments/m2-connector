@@ -1,0 +1,120 @@
+/**
+ vim: set ts=4 sw=4 sts=4 et:
+ * X-Payments Connector Settings
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * @author     Qualiteam Software <info@x-cart.com>
+ * @category   CDev
+ * @package    CDev_XPaymentsConnector
+ * @copyright  (c) 2010-present Qualiteam software Ltd <info@x-cart.com>. All rights reserved
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+ul.xpc-payment-cards {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.xpc-card-logo {
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("../images/card-types.png");
+    background-origin: padding-box;
+    background-repeat: no-repeat;
+    background-size: 40px auto;
+    width: 40px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+    background-position: 0 0%;
+}
+
+.xpc-card-logo-list {
+    background-image: url("../images/card-types.png");
+    background-origin: padding-box;
+    background-repeat: no-repeat;
+    background-size: 45px auto;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+    vertical-align: middle;
+    margin-right: 15px;
+}
+
+.xpc-card-logo.mc,
+.xpc-card-logo-list.mc {
+    background-position: 0 10%;
+}
+
+.xpc-card-logo.visa,
+.xpc-card-logo-list.visa {
+    background-position: 0 20%;
+}
+
+.xpc-card-logo.jcb,
+.xpc-card-logo-list.jcb {
+    background-position: 0 30%;
+}
+
+.xpc-card-logo.amex,
+.xpc-card-logo-list.amex {
+    background-position: 0 40%;
+}
+
+.xpc-card-logo.dc,
+.xpc-card-logo.dicl,
+.xpc-card-logo-list.dc,
+.xpc-card-logo-list.dicl {
+    background-position: 0 50%;
+}
+
+.xpc-card-logo.paypal,
+.xpc-card-logo-list.paypal {
+    background-position: 0 60%;
+}
+
+.xpc-card-logo.sw,
+.xpc-card-logo-list.sw, {
+    background-position: 0 70%;
+}
+
+.xpc-card-logo.cup,
+.xpc-card-logo-list.cup {
+    background-position: 0 80%;
+}
+
+.xpc-card-logo.bc,
+.xpc-card-logo.bc-list {
+    background-position: 0 90%;
+}
+
+.add-new-card-container:after {
+    clear: both;
+}
+
+iframe.xpc-iframe {
+    width: 400px;
+    height: 1px;
+    border: 0;
+    float: left;
+}
+
+div.xpc-address {
+    float: left;
+    margin-left: 60px;
+    line-height: 2em;
+}
+
+div.xpc-address address {
+    font-style: normal;
+}

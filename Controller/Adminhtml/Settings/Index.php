@@ -25,7 +25,7 @@ namespace CDev\XPaymentsConnector\Controller\Adminhtml\Settings;
 /**
  * X-Payments Connector settings
  */
-class Index extends AbstractAction
+class Index extends \CDev\XPaymentsConnector\Controller\Adminhtml\Settings
 {
     /**
      * Execute action
@@ -34,6 +34,8 @@ class Index extends AbstractAction
      */
     public function execute()
     {
+        $this->initCurrentStoreId();
+
         return $this->pageFactory->create();
     }
 }

@@ -22,66 +22,67 @@
 
 namespace CDev\XPaymentsConnector\Controller\Processing;
 
+use CDev\XPaymentsConnector\Controller\RegistryConstants;
+
 /**
  * Redirect to the payment form (in iframe)
  */
 class Redirect extends \Magento\Framework\App\Action\Action
 {
     /**
+     * Session models
+     */
+    protected $customerSession = null;
+    protected $checkoutSession = null;
+
+    /**
      * Result page factory
      */
-    protected $resultPageFactory = null;
+    protected $pageFactory = null;
 
     /**
-     * Controller result factory
+     * XPC Quote Data factory
      */
-    protected $resultFactory = null;
+    protected $quoteDataFactory = null;
 
     /**
-     * Quote factory
+     * XPC Helper
      */
-    private $quoteFactory = null;
+    protected $helper = null;
 
     /**
-     * Helper
+     * Core coreRegistry
      */
-    private $helper = null;
-
-    /**
-     * Quote
-     */
-    private $quote = null;
+    protected $coreRegistry = null;
 
     /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Framework\Controller\ResultFactory $resultFactory
-     * @param \Magento\Checkout\Model\Session $session
-     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Framework\View\Result\PageFactory $pageFactory
+     * @param \Magento\Checkout\Model\Session\Proxy $checkoutSession
+     * @param \Magento\Customer\Model\Session\Proxy $customerSession
      * @param \CDev\XPaymentsConnector\Helper\Data $helper
-     * @param \CDev\XPaymentsConnector\Model\QuoteDataFactory $quoteFactory
+     * @param \CDev\XPaymentsConnector\Model\QuoteDataFactory $quoteDataFactory
      *
      * @return void
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Framework\Controller\ResultFactory $resultFactory,
-        \Magento\Checkout\Model\Session $session,
-        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Framework\View\Result\PageFactory $pageFactory,
+        \Magento\Checkout\Model\Session\Proxy $checkoutSession,
+        \Magento\Customer\Model\Session\Proxy $customerSession,
         \CDev\XPaymentsConnector\Helper\Data $helper,
-        \CDev\XPaymentsConnector\Model\QuoteDataFactory $quoteFactory
+        \CDev\XPaymentsConnector\Model\QuoteDataFactory $quoteDataFactory,
+        \Magento\Framework\Registry $coreRegistry
     ) {
-        $this->resultPageFactory = $resultPageFactory;
-        $this->resultFactory = $resultFactory;
+        $this->pageFactory = $pageFactory;
         $this->helper = $helper;
+        $this->customerSession = $customerSession;
+        $this->checkoutSession = $checkoutSession;
+        $this->quoteDataFactory = $quoteDataFactory;
 
-        $this->quote = $session->getQuote();
-        $this->session = $customerSession;
-
-        $this->quoteFactory = $quoteFactory;
+        $this->coreRegistry = $coreRegistry;
 
         parent::__construct($context);
     }
@@ -91,10 +92,10 @@ class Redirect extends \Magento\Framework\App\Action\Action
      *
      * @return string
      */
-    private function getReturnUrl()
+    protected function getReturnUrl()
     {
         $params = array(
-            'quote_id' => $this->quote->getId(),
+            'quote_id' => $this->checkoutSession->getQuote()->getId(),
             'conf_id'  => $this->helper->settings->getXpcConfig('active_confid'),
         );
 
@@ -106,10 +107,10 @@ class Redirect extends \Magento\Framework\App\Action\Action
      *
      * @return string
      */
-    private function getCallbackUrl()
+    protected function getCallbackUrl()
     {
         $params = array(
-            'quote_id' => $this->quote->getId(),
+            'quote_id' => $this->checkoutSession->getQuote()->getId(),
             'conf_id'  => $this->helper->settings->getXpcConfig('active_confid'),
         );
 
@@ -123,26 +124,26 @@ class Redirect extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        // Apparently this is not necesary, but just in case
-        $this->quote->reserveOrderId()->save();
+        $quote = $this->checkoutSession->getQuote();
 
-        $quoteData = $this->quoteFactory->create()->loadByConf(
-            $this->quote->getId(),
-            $this->helper->settings->getXpcConfig('active_confid')
-        );
+        $this->coreRegistry->register(RegistryConstants::CURRENT_STORE_ID, $quote->getStoreId());
+
+        // Apparently this is not necesary, but just in case
+        $quote->reserveOrderId()->save();
+
+        $quoteData = $this->quoteDataFactory->create()->loadByQuote($quote);
 
         if (
-            empty($quoteData->getToken())
-            || empty($quoteData->getTxnid())
+            !$quoteData->isValid()
             || $this->getRequest()->getParam('drop_token')
         ) {
 
-            $cart = $this->helper->cart->prepareCart($this->quote);
+            $cart = $this->helper->cart->prepareCart($quote);
 
             // Data to send to X-Payments
             $data = array(
                 'confId'      => $this->helper->settings->getXpcConfig('active_confid'),
-                'refId'       => 'Order #' . $this->quote->getReservedOrderId(),
+                'refId'       => 'Order #' . $quote->getReservedOrderId(),
                 'cart'        => $cart,
                 'returnUrl'   => $this->getReturnUrl(),
                 'callbackUrl' => $this->getCallbackUrl(),
@@ -150,37 +151,14 @@ class Redirect extends \Magento\Framework\App\Action\Action
 
             $response = $this->helper->api->initPayment($data);
 
-            $this->session->setXpcTxnId($response->getField('txnId'));
-
-            $quoteData->setQuoteId($this->quote->getId())
+            $quoteData->setQuoteId($quote->getId())
                 ->setConfId($this->helper->settings->getXpcConfig('active_confid'))
                 ->setToken($response->getField('token'))
                 ->setTxnid($response->getField('txnId'))
+                ->setExpiration()
                 ->save();
         }
 
-        $action = $this->helper->settings->getPaymentUrl();
-
-        $contents = '<form id="xpc-form" action="' . $action . '" method="post">'
-            . '<input type="hidden" name="action" value="start">'
-            . '<input type="hidden" name="token" value="' . $quoteData->getToken() . '">'
-            . '</form>'
-            . '<script>document.getElementById("xpc-form").submit()</script>';
-
-        $resultRaw = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_RAW);
-        $resultRaw->setContents($contents);
-
-        return $resultRaw;
-
-        /* TODO: implement template
-        $resultPage = $this->resultPageFactory->create(
-            false, 
-            array(
-                'template' => 'CDev_XPaymentsConnector::processing/blank.phtml',
-                'form_action' => $action,
-                'token' => $token,
-            )
-        );
-        */
+        return $this->pageFactory->create();
     }
 }

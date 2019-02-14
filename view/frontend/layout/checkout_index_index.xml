@@ -22,6 +22,9 @@
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="CDev_XPaymentsConnector/css/xpc.css" />
+    </head>
     <body>
         <referenceBlock name="checkout.root">
             <arguments>
@@ -43,6 +46,14 @@
                                                                     <item name="component" xsi:type="string">CDev_XPaymentsConnector/js/view/payment/xpc</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="xpc" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                                <item name="xpc_payment_card" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">CDev_XPaymentsConnector/js/view/payment/xpc-payment-card</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="xpc_payment_card" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
                                                                     </item>

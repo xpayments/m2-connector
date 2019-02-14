@@ -40,18 +40,19 @@ class ConfigData extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     /**
      * Load data by name
      *
-     * @param \CDev\XPaymentsConnector\Model\ConfigData $model
      * @param string $name Name
      *
      * @return int
      */
-    public function loadByName(\CDev\XPaymentsConnector\Model\ConfigData $model, $name)
+    public function loadByName($name)
     {
         $table = $this->getMainTable();
         $connection = $this->getConnection();
         $where = $connection->quoteInto('name = ?', $name);
 
-        $select = $connection->select()->from($table, array('id'))->where($where);
+        $select = $connection->select()
+            ->from($table, array('id'))
+            ->where($where);
 
         $id = $connection->fetchOne($select);
 

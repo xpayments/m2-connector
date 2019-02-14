@@ -62,6 +62,24 @@ class Api extends AbstractHelper
     const TYPE_CELL = 'cell';
 
     /**
+     * API Response Factory
+     */
+    protected $responseFactory = null;
+
+    /**
+     * Constructor
+     *
+     * @param \CDev\XPaymentsConnector\Transport\ApiResponseFactory $responseFactory
+     *
+     * @return void
+     */
+    public function __construct(
+        \CDev\XPaymentsConnector\Transport\ApiResponseFactory $responseFactory
+    ) {
+        $this->responseFactory = $responseFactory;
+    }
+
+    /**
      * CURL headers collector callback
      *
      * @return mixed
@@ -94,6 +112,88 @@ class Api extends AbstractHelper
     }
 
     /**
+     * Prepare request data
+     *
+     * @param array $data
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     *
+     * @return array
+     */
+    protected function prepareRequestData($data)
+    {
+        // Check configuration
+        if (!$this->helper->settings->isConfigured()) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('X-Payments Connector is not configured'));
+        }
+
+        // Check requirements
+        if (!$this->helper->settings->checkRequirements()) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('Check module requirements is failed'));
+        }
+
+        // Convert array to XML
+        $xml = $this->convertHash2XML($data);
+
+        if (!$xml) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('Data is not valid'));
+        }
+
+        // Encrypt
+        $xml = $this->encrypt($xml);
+        if (!$xml) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('Data is not encrypted'));
+        }
+
+        // Prepare request
+        $post = array(
+            'cart_id' => $this->helper->settings->getXpcConfig('store_id'),
+            'request' => $xml
+        );
+
+        return $post;
+    }
+
+    /**
+     * Execute HTTPS POST request and decrypt response
+     *
+     * @param array $post POST-ed data
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     *
+     * @return array
+     */
+    protected function getResponse($post)
+    {
+        $this->getCurlHeadersCollector(false);
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $this->helper->settings->getApiUrl());
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15000);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'getCurlHeadersCollector'));
+
+        $body = curl_exec($ch);
+        $errno = curl_errno($ch);
+        $error = curl_error($ch);
+        $headers = $this->getCurlHeadersCollector(true);
+
+        curl_close($ch);
+
+        // Check curl error
+        if (!empty($error) || 0 != $errno) {
+            throw new \Magento\Framework\Exception\LocalizedException(__('Communication error. Curl error #%1: %2', $errno, $error));
+        }
+
+        return $this->decryptXml($body, $headers);
+    }
+
+    /**
      * Request
      *
      * @param string $target Request target
@@ -102,10 +202,9 @@ class Api extends AbstractHelper
      *
      * @return array (Operation status & response array)
      */
-    private function request($target, $action, array $data = array())
+    protected function request($target, $action, array $data = array())
     {
-        // TODO: They say it's bad: http://devdocs.magento.com/guides/v2.0/extension-dev-guide/depend-inj.html#rules-for-using-dependency-injection
-        $apiResponse = new \CDev\XPaymentsConnector\Transport\ApiResponse;
+        $apiResponse = $this->responseFactory->create();
 
         $data['target'] = $target;
         $data['action'] = $action;
@@ -121,61 +220,9 @@ class Api extends AbstractHelper
 
         try {
 
-            // Check configuration
-            if (!$this->helper->settings->isConfigured()) {
-                throw new \Exception('X-Payments Connector is not configured');
-            }
+            $post = $this->prepareRequestData($data);
 
-            // Check requirements
-            if (!$this->helper->settings->checkRequirements()) {
-                throw new \Exception('Check module requirements is failed');
-            }
-
-            // Convert array to XML
-            $xml = $this->convertHash2XML($data);
-
-            if (!$xml) {
-                throw new \Exception('Data is not valid');
-            }
-
-            // Encrypt
-            $xml = $this->encrypt($xml);
-            if (!$xml) {
-                throw new \Exception('Data is not encrypted');
-            }
-
-            // HTTPS request
-            $post = array(
-                'cart_id' => $this->helper->settings->getXpcConfig('store_id'),
-                'request' => $xml
-            );
-
-            $this->getCurlHeadersCollector(false);
-
-            $ch = curl_init();
-
-            curl_setopt($ch, CURLOPT_URL, $this->helper->settings->getApiUrl());
-            curl_setopt($ch, CURLOPT_HEADER, false);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 15000);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
-            curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'getCurlHeadersCollector'));
-
-            $body = curl_exec($ch);
-            $errno = curl_errno($ch);
-            $error = curl_error($ch);
-            $headers = $this->getCurlHeadersCollector(true);
-
-            curl_close($ch);
-
-            // Check curl error
-            if (!empty($error) || 0 != $errno) {
-                throw new \Exception('Communication error. Curl error #' . $errno . ': ' . $error);
-            }
-
-            $response = $this->decryptXml($body, $headers);
+            $response = $this->getResponse($post);
 
             $apiResponse->setStatus(true);
             $apiResponse->setResponse($response);
@@ -188,10 +235,10 @@ class Api extends AbstractHelper
                 $apiResponse->setErrorMessage($response['error_message']);
             }
 
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
 
             $apiResponse->setStatus(false);
-            $apiResponse->setErrorMessage($e->getMessage());
+            $apiResponse->setErrorMessage($exception->getMessage());
         }
 
         $this->helper->logInfo('Response from X-Payments', $apiResponse->getData());
@@ -225,26 +272,26 @@ class Api extends AbstractHelper
 
             $error = implode(PHP_EOL, $error);
 
-            throw new \Exception($error);
+            throw new \Magento\Framework\Exception\LocalizedException(__($error));
         }
 
         // Decrypt
         list($responseStatus, $response) = $this->decrypt($body);
 
         if (!$responseStatus) {
-            throw new \Exception('Response is not decrypted (Error: ' . $response . ')');
+            throw new \Magento\Framework\Exception\LocalizedException(__('Response is not decrypted (Error: %1)', $response));
         }
 
         // Convert XML to array
         $response = $this->convertXML2Hash($response);
 
         if (!is_array($response)) {
-            throw new \Exception('Unable to convert response into XML');
+            throw new \Magento\Framework\Exception\LocalizedException(__('Unable to convert response into XML'));
         }
 
         // The 'Data' tag must be set in response
         if (!isset($response[self::TAG_ROOT])) {
-            throw new \Exception('Response does not contain any data');
+            throw new \Magento\Framework\Exception\LocalizedException(__('Response does not contain any data'));
         }
 
         return $response[self::TAG_ROOT];
@@ -406,14 +453,14 @@ class Api extends AbstractHelper
         // Encrypt
         $key = openssl_pkey_get_public($this->helper->settings->getXpcConfig('public_key'));
         if (!$key) {
-            throw new \Exception('Cannot initialize public key');
+            throw new \Magento\Framework\Exception\LocalizedException(__('Cannot initialize public key'));
         }
 
         $data = str_split($data, self::CHUNK_LENGTH);
         $crypttext = null;
         foreach ($data as $k => $chunk) {
             if (!openssl_public_encrypt($chunk, $crypttext, $key)) {
-                throw new \Exception('Cannot enctypt chunk');
+                throw new \Magento\Framework\Exception\LocalizedException(__('Cannot enctypt chunk'));
             }
 
             $data[$k] = $crypttext;
@@ -440,7 +487,7 @@ class Api extends AbstractHelper
             $this->helper->settings->getXpcConfig('private_key_password')
         );
         if (!$res) {
-            throw new \Exception('Private key is not initialized');
+            throw new \Magento\Framework\Exception\LocalizedException(__('Private key is not initialized'));
         }
 
         $data = substr($data, 3);
@@ -449,7 +496,7 @@ class Api extends AbstractHelper
         $data = array_map('base64_decode', $data);
         foreach ($data as $k => $s) {
             if (!openssl_private_decrypt($s, $newsource, $res)) {
-                throw new \Exception('Can not decrypt chunk');
+                throw new \Magento\Framework\Exception\LocalizedException(__('Can not decrypt chunk'));
             }
 
             $data[$k] = $newsource;
@@ -462,21 +509,21 @@ class Api extends AbstractHelper
         // Postprocess
         $lenSalt = substr($data, 0, 12);
         if (!preg_match('/^\d+$/Ss', $lenSalt)) {
-            throw new \Exception('Salt length prefix has wrong format');
+            throw new \Magento\Framework\Exception\LocalizedException(__('Salt length prefix has wrong format'));
         }
 
-        $lenSalt = intval($lenSalt);
-        $data = substr($data, 12 + intval($lenSalt));
+        $lenSalt = (int)$lenSalt;
+        $data = substr($data, 12 + (int)$lenSalt);
 
         $lenCRC = substr($data, 0, 12);
         if (!preg_match('/^\d+$/Ss', $lenCRC) || $lenCRC < 9) {
-            throw new \Exception('CRC length prefix has wrong format');
+            throw new \Magento\Framework\Exception\LocalizedException(__('CRC length prefix has wrong format'));
         }
 
-        $lenCRC = intval($lenCRC);
+        $lenCRC = (int)$lenCRC;
         $crcType = trim(substr($data, 12, 8));
         if ($crcType !== 'MD5') {
-            throw new \Exception('CRC hash is not MD5');
+            throw new \Magento\Framework\Exception\LocalizedException(__('CRC hash is not MD5'));
         }
         $crc = substr($data, 20, $lenCRC - 8);
 
@@ -484,14 +531,14 @@ class Api extends AbstractHelper
 
         $lenData = substr($data, 0, 12);
         if (!preg_match('/^\d+$/Ss', $lenData)) {
-            throw new \Exception('Data block length prefix has wrong format');
+            throw new \Magento\Framework\Exception\LocalizedException(__('Data block length prefix has wrong format'));
         }
 
-        $data = substr($data, 12, intval($lenData));
+        $data = substr($data, 12, (int)$lenData);
 
         $currentCRC = md5($data, true);
         if ($currentCRC !== $crc) {
-            throw new \Exception('Original CRC and calculated CRC is not equal');
+            throw new \Magento\Framework\Exception\LocalizedException(__('Original CRC and calculated CRC is not equal'));
         }
 
         return array(true, $data);
@@ -510,7 +557,7 @@ class Api extends AbstractHelper
     {
         srand();
 
-        $hashCode = strval(rand(0, 1000000));
+        $hashCode = (string)rand(0, 1000000);
 
         $params = array(
             'testCode' => $hashCode,
@@ -591,27 +638,17 @@ class Api extends AbstractHelper
      * Send Payment info request
      *
      * @param string  $txnId  X-Payments transaction id
-     * @param boolean $refresh Refresh data flag
-     * @param boolean $withAdditionalInfo Flag for additional info
      *
      * @return \CDev\XPaymentsConnector\Transport\ApiResponse
      */
-    public function requestPaymentInfo($txnId, $refresh = false, $withAdditionalInfo = false)
+    public function requestPaymentInfo($txnId)
     {
         $data = array(
             'txnId' => $txnId,
         );
 
-        if ($withAdditionalInfo) {
-
-            $action = 'get_additional_info';
-
-        } else {
-
-            $data['refresh'] = $refresh ? 1 : 0;
-
-            $action = 'get_info';
-        }
+        // For backwards compatibility
+        $action = 'get_additional_info';
 
         return $this->request('payment', $action, $data);
     }
@@ -622,7 +659,7 @@ class Api extends AbstractHelper
      * @param string  $txnId  X-Payments transaction id
      * @param float   $amount Amount
      *
-     * @return CDev_XPaymentsConnector_Transport_ApiResponse
+     * @return \CDev\XPaymentsConnector\Transport\ApiResponse
      */
     public function requestPaymentCapture($txnId, $amount = false)
     {
@@ -643,7 +680,7 @@ class Api extends AbstractHelper
      * @param string  $txnId  X-Payments transaction id
      * @param float   $amount Amount
      *
-     * @return CDev_XPaymentsConnector_Transport_ApiResponse
+     * @return \CDev\XPaymentsConnector\Transport\ApiResponse
      */
     public function requestPaymentVoid($txnId, $amount = false)
     {
@@ -664,7 +701,7 @@ class Api extends AbstractHelper
      * @param string  $txnId  X-Payments transaction id
      * @param float   $amount Amount
      *
-     * @return CDev_XPaymentsConnector_Transport_ApiResponse
+     * @return \CDev\XPaymentsConnector\Transport\ApiResponse
      */
     public function requestPaymentRefund($txnId, $amount = false)
     {
@@ -677,5 +714,17 @@ class Api extends AbstractHelper
         }
 
         return $this->request('payment', 'refund', $data);
+    }
+
+    /**
+     * Send recharge payment request
+     *
+     * @param array $data Request data
+     *
+     * @return \CDev\XPaymentsConnector\Transport\ApiResponse
+     */
+    public function requestPaymentRecharge($data)
+    {
+        return $this->request('payment', 'recharge', $data);
     }
 }
