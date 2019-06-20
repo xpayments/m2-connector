@@ -50,6 +50,7 @@ class Render extends \Magento\Ui\Controller\Adminhtml\Index\Render
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\View\Element\UiComponentFactory $factory
+     * @param \Magento\Ui\Model\UiComponentTypeResolver $contentTypeResolver
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      * @param \Magento\Framework\Escaper $escaper
@@ -60,6 +61,7 @@ class Render extends \Magento\Ui\Controller\Adminhtml\Index\Render
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\View\Element\UiComponentFactory $factory,
+        \Magento\Ui\Model\UiComponentTypeResolver $contentTypeResolver,
         \Magento\Framework\Registry $coreRegistry,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory = null,
         \Magento\Framework\Escaper $escaper = null,
@@ -68,7 +70,7 @@ class Render extends \Magento\Ui\Controller\Adminhtml\Index\Render
         
         $this->coreRegistry = $coreRegistry;
 
-        parent::__construct($context, $factory, $resultJsonFactory, $escaper, $logger);
+        parent::__construct($context, $factory, $contentTypeResolver, $resultJsonFactory, $escaper, $logger);
     }
 
     /**

@@ -27,7 +27,7 @@ use CDev\XPaymentsConnector\Controller\RegistryConstants;
 /**
  * Callback processing
  */
-class Callback extends \Magento\Framework\App\Action\Action
+class Callback extends \Magento\Framework\App\Action\Action implements \Magento\Framework\App\CsrfAwareActionInterface
 {
     /**
      * Result page factory
@@ -83,6 +83,32 @@ class Callback extends \Magento\Framework\App\Action\Action
         parent::__construct($context);
 
         $this->coreRegistry = $coreRegistry;
+    }
+
+    /**
+     * Create exception in case CSRF validation failed.
+     * Return null if default exception will suffice.
+     *
+     * @param \Magento\Framework\App\RequestInterface $request
+     *
+     * @return InvalidRequestException|null
+     */
+    public function createCsrfValidationException(\Magento\Framework\App\RequestInterface $request): ?\Magento\Framework\App\Request\InvalidRequestException
+    {
+        return null;
+    }
+
+    /**
+     * Perform custom request validation.
+     * Return null if default validation is needed.
+     *
+     * @param \Magento\Framework\App\RequestInterface $request
+     *
+     * @return bool|null
+     */
+    public function validateForCsrf(\Magento\Framework\App\RequestInterface $request): ?bool
+    {
+        return true;
     }
 
     /**

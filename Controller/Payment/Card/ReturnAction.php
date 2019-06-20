@@ -27,7 +27,7 @@ use CDev\XPaymentsConnector\Controller\RegistryConstants;
 /**
  * Add new payment card return action
  */
-class ReturnAction extends \CDev\XPaymentsConnector\Controller\Payment\Card
+class ReturnAction extends \CDev\XPaymentsConnector\Controller\Payment\Card implements \Magento\Framework\App\CsrfAwareActionInterface
 {
     /**
      * Customer repository
@@ -79,6 +79,32 @@ class ReturnAction extends \CDev\XPaymentsConnector\Controller\Payment\Card
         $this->paymentCardFactory = $paymentCardFactory;
         $this->helper = $helper;
         $this->pageFactory = $pageFactory;
+    }
+
+    /**
+     * Create exception in case CSRF validation failed.
+     * Return null if default exception will suffice.
+     *
+     * @param \Magento\Framework\App\RequestInterface $request
+     *
+     * @return InvalidRequestException|null
+     */
+    public function createCsrfValidationException(\Magento\Framework\App\RequestInterface $request): ?\Magento\Framework\App\Request\InvalidRequestException
+    {
+        return null;
+    }
+
+    /**
+     * Perform custom request validation.
+     * Return null if default validation is needed.
+     *
+     * @param \Magento\Framework\App\RequestInterface $request
+     *
+     * @return bool|null
+     */
+    public function validateForCsrf(\Magento\Framework\App\RequestInterface $request): ?bool
+    {
+        return true;
     }
 
     /**

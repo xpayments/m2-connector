@@ -30,7 +30,7 @@
                 <model>CDev\XPaymentsConnector\Model\Payment\Method\Xpc</model>
                 <order_status>pending_payment</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Credit Card</title>
+                <title>Credit or Debit Card</title>
                 <currency>USD</currency>
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
