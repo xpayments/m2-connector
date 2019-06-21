@@ -59,7 +59,7 @@ abstract class Settings extends \Magento\Backend\App\Action
      * Default data for payment configuration (e.g. just imported)
      */
     private $defaultPaymentData = array(
-        'title' => 'Credit card (X-Payments)',
+        'title' => 'Credit or Debit Card (X-Payments)',
         'sort_order' => '0',
         'allowspecific' => '0',
         'specificcountry' => '',
@@ -431,14 +431,14 @@ abstract class Settings extends \Magento\Backend\App\Action
 
         if ($paymentConf instanceof \CDev\XPaymentsConnector\Model\PaymentConfiguration) {
 
-            $result['title'] = 'Credit card (' . $paymentConf->getData('name') . ')';
+            $result['title'] = 'Credit or Debit Card (' . $paymentConf->getData('name') . ')';
 
         } elseif (
             is_array($paymentConf)
             && !empty($paymentConf['name'])
         ) {
 
-            $result['title'] = 'Credit card (' . $paymentConf['name'] . ')';
+            $result['title'] = 'Credit or Debit Card (' . $paymentConf['name'] . ')';
         }
 
         return $result;
