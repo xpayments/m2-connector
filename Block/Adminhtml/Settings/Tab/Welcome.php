@@ -76,7 +76,7 @@ class Welcome extends \CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab
      */
     public function getUserManualMagentoUrl()
     {
-        return 'https://www.x-payments.com/help/X-Payments:Using_X-Payments_with_Magento#Connecting_X-Payments_and_Magento';
+        return 'https://www.x-payments.com/help/X-Payments:Configure_the_connection_to_X-Payments_in_the_Magento_2_store_Administrator_panel';
     }
 
     /**
@@ -87,15 +87,5 @@ class Welcome extends \CDev\XPaymentsConnector\Block\Adminhtml\Settings\Tab
     public function getUserManualGatewaysUrl()
     {
         return 'https://www.x-payments.com/help/X-Payments:Payment_configurations';
-    }
-
-    /**
-     * Get video link
-     *
-     * @return string
-     */
-    public function getVideoUrl()
-    {
-        return 'https://www.youtube.com/embed/OVN8acj45ic';
     }
 }
