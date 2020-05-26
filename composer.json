@@ -1,8 +1,8 @@
 {
     "name": "cdev/x-payments-connector",
-    "description": "X-Payments connector. This extension integrates Magento 2 with X-Payments - a PA-DSS certified payment module.",
+    "description": "X-Payments Connector. This extension integrates Magento 2 with X-Payments - PCI level 1 certified & PSD2/SCA ready all-in-one secure credit card processing solution.",
     "type": "magento2-module",
-    "version": "100.3.1-rc",
+    "version": "100.3.1",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
